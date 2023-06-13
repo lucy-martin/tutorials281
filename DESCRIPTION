@@ -1,0 +1,10 @@
+Package: tutorials281
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: UNC Poli 281 Instructional Team
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: This package houses the learnr tutorials for Poli 281 at UNC-Chapel Hill
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
