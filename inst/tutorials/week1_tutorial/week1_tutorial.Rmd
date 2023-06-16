@@ -50,37 +50,6 @@ When you open R Studio, you will see four panels or windows within the R Studio 
 
 ## Comprehension Quiz
 
-Answer the following questions about what you just learned! This is not graded.
+Follow the link to complete some questions about what you have just learned. 
 
-```{r quiz}
-quiz(
-  question("Which of the following are open source, free softwares that can be used for data analysis?",
-    answer("Stata"),
-    answer("R", correct = TRUE),
-    answer("Python", correct = TRUE),
-    answer("SPSS"),
-    allow_retry = T
-  ),
-  question("In which R Studio panel do you see your R scripts, which you can then save for later use?",
-    answer("The Source Panel", correct = TRUE),
-    answer("The Console"),
-    answer("The Environment"),
-    answer("The panel for help, packages, and plots"),
-    allow_retry = T
-  ),
-  question("When you execute your code in the source panel (in your R Script), where does the code and its result appear?",
-    answer("On my Desktop"),
-    answer("In the Environment"),
-    answer("As a Word Document"),
-    answer("In the Console", correct = TRUE),
-    allow_retry = T 
-  ),
-  question("If I want to run a chunk of code, what **should** I do?",
-    answer("Highlight the code, and click Control + Enter", correct = TRUE),
-    answer("Click 'Run'", message = "You can do this, but it is not the most efficient way"),
-    answer("Click 'Code' and then 'Run Code'", message = "You can do this, but it is not the most efficient way"),
-    answer("Highlight the code, and press the space bar"),
-    allow_retry = T
-    )
-)
-```
+[Quiz link here](https://unc.az1.qualtrics.com/jfe/form/SV_9zDmAIAGw29Ywqa)
