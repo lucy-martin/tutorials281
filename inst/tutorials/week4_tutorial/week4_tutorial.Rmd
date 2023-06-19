@@ -1,0 +1,465 @@
+---
+title: "Tutorial for Week 4"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = TRUE)
+
+#load in data on war casualties
+war_data <- read.csv("war_casualties.csv")
+
+war_data$casualty_est <- ifelse(war_data$war == "World War I" |
+                                  war_data$war =="Italian Wars" |
+                                  war_data$war == "Korean War", -99, 
+                                war_data$casualty_est)
+
+
+votes <- data.frame(vote_total = c(988000, 789999, 476222, 896123),
+                    vote_dem = c(654333, 128093, 367806, 237809),
+                    vote_rep = c(332000, 651900, 102311, 610321),
+                    town = c("A", "B", "C", "D"))
+
+
+```
+
+
+## Welcome
+
+In this week's class, we will continue to learn how to summarize data, calculate some descriptive statistics, learn how to recode variables when necessary, and create a new variable. In Part A, we will focus on recoding variables and missing data. Please continue to Part B when you complete this tutorial. 
+
+## Topic 1: Recoding Variables and Handling Missing Data
+
+Up until now, we have largely been working with data frames that have complete observations. That is, there are no missing values in our data. Missing data is very common, and can happen for a variety of reasons. Sometimes data is hard to collect or might not exist! 
+
+How do we handle this in our data? Typically, when we have a missing value, we code it as `NA` or "Not Available". R is able to recognize this type of value as a missing piece of information. However, when working with different data sets, there are a variety of conventions for coding missing values. Typically, you have access to clear documentation in which the creators of a data base will inform you how they coded, or labelled, missing values.
+
+For example, it is very common for data bases to code missing values using numbers like `-99` or `-98` which are values that are very uncommon for variables to take. Let's take a look at a data set about some major wars in global history. The data set `wars_data` includes five variables:
+
+-   `war`: the title of the conflict
+-   `casualty_est`: a lower estimate of the total number of casualties
+-   `start_year`: the year the conflict began
+-   `end_year`: the year the conflict ended
+-   `location`: where the conflict occurred
+
+```{r, echo = T, eval = T}
+
+summary(war_data) #summarize data
+
+
+head(war_data) #view first few observations
+```
+
+When we take a look at this data, something stands out! What seems off about the `casualty_est` variable?
+
+Well, these variables occasionally take on the value `-99` which seems to be an uncommon value and is not a number that corresponds to a true number of causalities. We take a look at the codebook, and we see that the researchers specified that `-99` here signifies a missing value. So now we need to handle this.
+
+If you recall from previous weeks, we can recode some part of a variable using square brackets, or `[]`. We can use this same strategy to recode `NA` values. In this case, we know we are interested in all of the cases where, for example, `casualty_est` is equal to `-99`. So, we would first index our data as such to identify these observations. It would look like this:
+
+```{r}
+war_data$casualty_est[war_data$casualty_est == -99]
+```
+
+The above line of code identifies all observations for the variable `casualty_est` within our `war_data` data set where `casualty_est == -99`. With this, we can then assign a new value to those observations. Instead of `-99`, we want these variables to have the value `NA`. We would do that like this:
+
+```{r, eval = TRUE}
+#recode variable
+war_data$casualty_est[war_data$casualty_est == -99] <- NA
+
+#summarize the variable to make sure it worked
+summary(war_data$casualty_est)
+```
+In the summary of the `casualty_est` variable, you can now see that the minimum value is no longer `-99`, but instead is `900000`. Further, R is now reporting that there are 3 `NA` values.
+
+## Topic 2: Recoding Non-Missing Values
+
+In addition to recoding `NA` values within our data, we can use the same strategy to recode variables to become other variables. This is helpful, for example, if we encounter an observation that may have an incorrect value
+
+For example, let's take a look at the variable `war` with all of the titles of the conflicts in the data set.
+
+```{r, eval = T}
+war_data$war
+```
+
+While most of the wars use fully capitalized titles, we seem to have a few that do not. In particular, it seems that World War II has lower case w's, as does the Taiping Rebellion, and the Hundred Years' War. Let's fix these so they all are properly capitalized.
+
+Let's start with World War II. How would we just isolate that observation within our data set?
+
+
+```{r, eval = T}
+war_data$war[war_data$war == "world war II"]
+```
+
+Great, now we want to recode this to have proper capitalization. That is, it should read "World War II" to be uniform with the rest of the data set.
+
+```{r}
+#recode
+war_data$war[war_data$war == "world war II"] <- "World War II"
+
+#check the new value
+war_data$war
+
+```
+
+Nice - it looks like it worked.
+
+### Practice
+
+Now your turn! Perform the same task as above, but now fix the "taiping rebellion" and the "hundred Years' War" to have uniform capitalization. That is, they should read "Taiping Rebellion" and "Hundred Years' War", respectively.
+
+```{r recode_1, exercise = TRUE, exercise.lines = 10}
+
+```
+```{r recode_1-hint-1}
+#recode
+war_data$war[war_data$war == "taiping rebellion"] <- "Taiping Rebellion"
+
+#check the new value
+war_data$war
+```
+
+
+## Topic 3: Summarizing with Missing Data
+
+Missing observations can affect how we summarize our data. Thankfully, many of the essential commands we use to summarize data -- like `mean()` -- take **arguments** which can help circumvent these issues. Some of these are **optional arguments**. Before diving into the specifics, and understanding how we can summarize our data even with missing values, we first need to learn about these **optional arguments**
+
+### Optional Arguments in Commands
+
+Remember from earlier in the class that **commands** (sometimes called **functions**) are directives or orders that you can give to R to perform a task. Thus far, we have used a variety of commands, such as `c()`, `mean()`, and `data.frame()`. 
+
+Every command accepts **arguments** or an input that is placed inside the `()`. So far, we have only worked with *required* arguments, or those that are absolutely essential for a function to work. For example, if we want to know the minimum value of a vector, we use the funciton `min()`. To do so, we have to give the `min()` function data:
+
+```{r, eval = T}
+
+new_data <- c(1, 2, 3, 5) #create a vector
+
+min(new_data) #give the min() command our data
+
+```
+
+But, if we do not give `min()` any data to work with, it will not work. See here:
+
+
+```{r, eval = T}
+
+min()  #produces an error
+
+```
+
+We can think of functions as, for example, a recipe. Say we have a command called `hamburger()`. To make a hamburger, we at minimum have to tell the cook (in this case R) what the main ingredient is (the patty). So, we have to do as follows:
+
+```{r, eval = F}
+hamburger(beef) #for a meat lover
+
+hamburger(veggie) #for a plant lover
+
+```
+
+
+
+The `hamburger()` function here takes the input -- beef or veggie -- and with its recipe, creates an output. In this case, hopefully a good hamburger.
+
+But, functions also have **optional arguments**, just like recipes do. Let's pretend we're making hamburgers.
+
+![](https://www.thespruceeats.com/thmb/d4-3wLGWdWQrdsYmcgOgokNDOxg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vegan-tofu-veggie-burgers-recipe-3377169-hero-01-a2dd40a53b1c4d3ba21625925cc9e28b.jpg){width=250px}
+
+
+When you order a hamburger at a restaurant, there are a bunch of options you can ask for. Let's start with the cook of the meat. Maybe the restaurant typically defaults to cooking a medium hamburger. But, if you want, you could say you want it well done. We would do that as follows:
+
+```{r, eval = F}
+
+hamburger(beef, cook = "well done")
+
+```
+
+Further, maybe the default for the restaurant is to give you a side of fries. But, maybe you want to opt for a potato salad today.
+
+```{r, eval = F}
+hamburger(beef, cook = "well done", side = "potato salad")
+```
+
+The important thing to note here is that *there is a typical way that the command is executed*. If you say nothing, the command will be executed in its default fashion -- in the case of a hamburger, that would be a medium hamburger with a side of french fries. However, *you have the option to change these defaults* to better fit what you want or need to do. 
+
+Now that we understand how optional arguments in commands work, we can move on to summarizing missing data. These two topics are related as key functions, such as `mean()`, require certain optional arguments to work with data that has missing observations.
+
+
+### Summarizing Missing Data
+
+Last week, we learned about using commands such as `mean()`, `min()`, and `max()` to summarize our data. Typically, each of these functions accept an argument `x` which is an object which contains multiple numbers. With these numbers, R would then calculate the mean, minimum (min), or maximum (max). For example, we calculate the mean of the following vector:
+
+```{r, eval = T}
+
+vector1 <- c(1, 5, 6, 9, 12) #create vector
+
+mean(vector1) #calculate mean
+
+```
+
+But, what happens if our data has missing values? Let's see.
+
+```{r, eval = T}
+
+vector2 <- c(1, NA, 5, 6, 9, NA, 12) #create vector with NAs
+
+mean(vector2) #calculate mean
+
+```
+
+In theory, the mean here should be the same as `vector1`, as `vector2` has the same exact numbers. However, R returns an `NA` as the mean for `vector2`. That is because R cannot calculate the mean of a an object with missing values. 
+
+Here is where **optional arguments** come into play! Let's check out the help file for the function `mean()`. To do so, we would execute the following line in the console of RStudio.
+
+```{r}
+?mean()
+```
+
+<iframe src="https://drive.google.com/file/d/1vzCTRW9VNyUJUNvXIROpaXWqCLqE0xhG/preview" width="640" height="480" allow="autoplay"></iframe>
+
+This help file tells us that there are two main optional arguments that we have to work with. One of them is trim, which is not relevant to us right now. But the second seems to have to do with `NA` values, or missing values. That is what we need!
+
+This part of the help file states that within the `mean()` function, we can establish `na.rm = TRUE` or `na.rm = FALSE`. If `TRUE`, the function will remove all `NA` values and calculate the mean without them. If `FALSE` the `NA` values will stay. It also tells us that the default is `FALSE`. 
+
+Let's see what happens if we repeat our above line of code -- where we try to calculate the mean of a vector with some `NA` values -- but now changing `na.rm` to be equal to `TRUE`.
+
+```{r, eval = T}
+
+vector2 <- c(1, NA, 5, 6, 9, NA, 12) #create vector with NAs
+
+mean(vector2, na.rm = T) #calculate mean and remove NAs
+
+```
+And check it out! We no longer see that the mean is `NA`, but rather that the mean is 6.6. Specifying that the `mean()` function should then ignore all `NA` values when calculating the mean helped us with this issue!
+
+
+Now, you try. Using the following code below, take `vector3` and try to calculate the mean first *without* specifying that R should remove the `NA` values. Then, try telling R to remove the RAs using the `na.rm` optional argument.
+
+```{r, eval = T}
+
+vector2 <- c(1, NA, 5, 6, 9, NA, 12) #create vector with NAs
+
+min(vector2) #calculate mean and remove NAs
+
+```
+
+Note that we can also do this with the `max()` function. Similar options are also available in other commands that we will use in the future.
+
+
+
+
+## Topic 4: Creating a New Variable
+
+In addition to recoding variables, we often want to create new variables in an existing data set. For example, let's examine a dataset which has some hypothetical information about three towns in the U.S.
+
+
+```{r, eval = T}
+
+summary(votes)
+
+```
+
+This dataset has three variables: `town` which is a label for each town (A thru D), `vote_total` which gives us a count of all those who voted, `vote_dem` which gives us a count of how many people in the town voted for a Democrat, and `vote_rep` which gives us a count of how many people in the town voted for a Republican in a recent gubernatorial election. 
+
+Now, although we have information about how many individuals voted for the Democrat and Republican candidate, it may also be useful for us to have in our data set how many people did *not* vote for either (that is, they voted for a third candidate - an independent). The below chunk of code creates a new variable which captures that. It is called `vote_ind`. 
+
+It does so by subtracting the total number of votes for the Democratic and Republican candidates from the total vote.
+
+```{r, eval = T}
+
+#create variable
+votes$vote_ind <- votes$vote_total - (votes$vote_dem + votes$vote_rep)
+
+#check out the data
+votes
+
+```
+
+
+Nice! It worked. Notice that after the `<-` operator, we have to call each variable within its data set. For example, we cannot write `vote_total - (vote_dem + vote_rep)`, but rather we must write `votes$vote_total - (votes$vote_dem + votes$vote_rep)`. You must be very specific with R to tell it from which dataset which are pulling those variables.
+
+For example, let's check out the below error which results from only telling R to subtraction `vote_dem` and `vote_rep` from `vote_total` without specifying our data set.
+
+```{r, eval = T, error = T}
+
+vote_total - (vote_dem + vote_rep)
+
+```
+
+It states that the first object it encounters, `vote_total`, is not found. That is because we have no object simply called `vote_total`, `vote_dem`, or `vote_rep`, but rather these objects only exist within our larger data set `votes`.
+
+### Practice
+
+Now you try! Imagine we want a new variable which captures the *percent* of all voters who voted for the Democratic candidate. We will call this new variable `dem_perc`. 
+
+To calculate this value, you will need to divide the number of votes for the Democratic candidate by number of total votes. You will then divide that quotient (the value resulting from that division) by 100.
+
+
+```{r dem_perc, exercise = TRUE, exercise.lines=5}
+
+#calculate percentage
+
+
+#return the full data set
+
+```
+```{r dem_perc-hint-1}
+
+#calculate percentage
+votes$dem_perc <- (votes$___ / votes$___) * ___
+
+#return the full data set
+votes
+
+```
+```{r dem_perc-hint-2}
+
+#calculate percentage
+votes$dem_perc <- (votes$vote_dem / votes$vote_total) * 100
+
+#return the full data set
+votes
+
+```
+
+
+## Topic 5: Using `ifelse()`
+
+In addition to creating new variables using the strategy we just learned, we can also do so with a very useful function called `ifelse()`. This function is a nice alternative to recoding or creating new variables with `[]` at times. For example,
+let's say we want to create a new categorical variable in our data set which captures if a town is considered to be a "large" or "small" district based on the total amount of voters it had that year. We can do that using square brackets in the following way:
+
+
+```{r, eval = TRUE}
+#create empty new variable
+votes$district_size <- NA
+
+#create label for large
+votes$district_size[votes$vote_total > 500000] <- "large"
+
+#create label for small
+votes$district_size[votes$vote_total <= 500000] <- "small"
+
+#check out data
+votes
+
+```
+
+With `ifelse()`, we can do this in one line of code. See below:
+
+```{r}
+#create new variable with ifelse()
+votes$town_size <- ifelse(votes$vote_total > 500000, "large", "small")
+
+#check out data
+votes
+
+```
+
+Great, definitely saved us some space! But how does the `ifelse()` command work? 
+
+To start, it is important to understand that the `ifelse` command accepts three necessary arguments. We can approach each of these arguments as an essential step in writing out the function. See the figure below:
+
+<iframe src="https://drive.google.com/file/d/1e6VFpbY8xCDBY0a69YB7WLg4O_OTyafE/preview" width="635" height="340" allow="autoplay"></iframe>
+
+**Step 1:** First, the `test` argument is a logical statement which the function evaluates. In the past example, we were interested in labeling towns in our `votes` data set as large voting districts if they had a total number of votes greater than 500 thousand. We would begin with the following:
+
+`ifelse(votes$vote_total > 500000, yes, no)`
+
+In the above statement, we are asking the `ifelse()` command to evaluate a logical statement `votes$vote_total > 500000`. It evaluates each observation for the `vote_total` variable to determine if `votes$vote_total > 500000` == `TRUE` or `FALSE`. This is the **if** part of the statement!
+
+**Step 2:** Let's move on to the `else` portion. We start with the `yes` argument. This specifies what the command should do if `votes$vote_total > 500000 == TRUE` or if the condition is met. In this case, we may want the command to return the statement `large` to indicate that the voting district is large. So we would write the following:
+
+`ifelse(votes$vote_total > 500000, "large", no)`
+
+**Step 3:** We now have one argument left, the `no` argument. This argument is reserved for what we would like the command to do if the condition is `FALSE`, or if it not `TRUE` (no). In this case, we will tell `ifelse()` to label these towns as representing "small" districts, and would write the following:
+
+
+`ifelse(votes$population > 500000, "large", "small")`
+
+Great! We have the `ifelse()` command written. But, where are we feeding this information to? We should save the resulting information into an object, as in the figure below:
+
+<iframe src="https://drive.google.com/file/d/1GFsT0u6zvfuSX96_el-wsU3Vnocu8l7V/preview" width="700" height="320" allow="autoplay"></iframe>
+
+Now, in the case of this example, this is where variable creation comes in. We can save the resulting information into a new variable. For our `object` of interest we will create a new variable called `district_size`. We would then do the following:
+
+```{r, eval = T}
+
+#create new variable using ifelse()
+votes$district_size <- ifelse(votes$vote_total > 500000, "large", "small")
+
+#check out the new variable in the data set
+votes
+
+```
+
+
+Note that above, we again have to save the information into a new variable which we attach to the data set using the `$` operator. 
+
+### Practice
+
+Your turn to try! Below, create a variable called `maj_dem` which is "Yes" if the majority of the citizens voted for the Democratic candidate, and "No" if not. To calculate this value, you will need to determine if the quotient of `vote_dem` / `vote_total` is greater than 0.5. We have provided some code below to help you get started.
+
+
+```{r maj_dem, exercise = TRUE, exercise.lines = 7}
+
+#ifelse() statement
+votes$___ <- ifelse(___/___ CONDITION ___, ___, ___)
+
+#check out the data set
+
+
+
+
+```
+```{r maj_dem-hint-1}
+
+#ifelse() statement
+votes$maj_dem <- ifelse(votes$vote_dem/votes$vote_total CONDITION 0.5, ___, ___)
+
+#check out the data set
+votes
+
+
+
+```
+```{r maj_dem-hint-2}
+
+#ifelse() statement
+votes$maj_dem <- ifelse(votes$vote_dem/votes$vote_total > 0.5, "Yes", "No")
+
+#check out the data set
+votes
+
+```
+
+### Chaining together `ifelse()` statements
+
+Note that we can also make `ifelse()` statements more complicated by chaining them together. We will learn more about this in class, but the below example will begin to get you acquainted with this idea.
+
+Let's revisit our first `ifelse()` statement where we created two labels for towns and how big of a voting district they each represent -- large and small. What would we do if we wanted to have three labels (large, medium, and small)? To do this, we would have to embed an `ifelse()` statement into another.
+
+
+
+```{r, eval = T}
+
+#create new variable using ifelse()
+votes$district_size <- ifelse(votes$vote_total > 800000, "large",
+                          ifelse(votes$vote_total < 800000 &
+                                   votes$vote_total > 600000, "medium",
+                                 "small"))
+
+#check out the new variable in the data set
+votes
+
+```
+
+
+Let's break down the above code to understand it a bit more. First, we tell R to return "large" if `votes$vote_total > 800000`. But after this condition, in the "no" position of the `ifelse()` statement, we now place another `ifelse()`. We are telling R that if this condition is NOT met, let's move on to another set of conditions. 
+
+Next we tell R to return the value "medium" if `votes$vote_total < 800000 & votes$vote_total > 600000` or if the town is BOTH smaller than 800 thousand and larger than 600 thousand. Following that, for all other instances (which would be smaller than 600000), we tell R to return "small".
+
+
+## Comprehension Quiz
+
+
+
