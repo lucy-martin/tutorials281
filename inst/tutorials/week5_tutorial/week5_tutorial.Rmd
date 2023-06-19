@@ -1,0 +1,300 @@
+---
+title: "Tutorial for Week 5"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(knitr)
+#library(tidyverse)
+library(dplyr)
+knitr::opts_chunk$set(echo = FALSE)
+
+nc_congress <- read.csv("nc_congress.csv")
+```
+
+## Welcome to the Tidyverse!
+
+This week, we will begin working with **the tidyverse** which is a collection of R packages used for data science. In particular, in this tutorial we will be working with one of the most used packages -- **dplyr**. This package is described by its developers as "a grammar of data manipulation" and provides to its users a consistent set of commands -- called "verbs" -- that help you to manipulate data. 
+
+In addition to this tutorial and lessons from class, you may also find the online book ["R for Data Science"](https://r4ds.had.co.nz/) created by the tidyverse developers to be helpful. 
+
+Note that to use the tidyverse, you will need to install the package. Then, before using it in an R script, you will need to load in the library. To install a packages, we use the command `install.packages()` and to load in a package before use we use `library()`.
+
+To install on your machine, you can type the following line of code into your R console:
+
+```{r, eval = F, echo = T}
+
+install.packages("tidyverse") #note here that you need quotes
+
+```
+
+Then, to load in the package prior to using it, you should include the following line of code in your R script:
+
+
+```{r, eval = F, echo = T}
+
+library(tidyverse) #note here you do not need quotes
+
+```
+
+
+## Topic 1: Important `dplyr` commands
+
+Within dplyr, there are a variety of commands which help us to easily manipulate our data. Some of these are similar to those available in base R (commands available in R without installing a package). There are situations in which you may which to use one or the other. But, the advantage of using dplyr will become clear as we move through the lessons this week.
+
+Some of the most useful commands from the dplyr package can be seen in the below table. We will walk through how we can use some of these commands, and you will also learn more about them in class this week! 
+
+```{r, echo = F, results = 'asis'}
+
+table <- data.frame(Command = c("select()", "filter()", "group_by()",
+                                "summarise()", "mutate()", "arrange()",
+                                "rename()"),
+                    Description = c("Selects columns (variables)",
+                                    "Filters (subsets) rows",
+                                    "Groups the data",
+                                    "Summarises (or aggregates) data",
+                                    "Creates new variables", 
+                                    "Sorts the data", "Renames a variable"))
+
+
+kable(table, caption = "Important dplyr Commands")
+
+```
+
+When learning these different commands, we will be working with some data about individuals elected to represent North Carolina in the U.S.'s 118th Congress. Let's check out the data. Below, you can take a look at each of the variables and toggle through the data set. 
+
+```{r, eval = T, echo = T}
+nc_congress
+```
+
+
+### The `filter()` command
+
+First, we will be using the `filter()` command, which is a command which allows us to subset our data. For example, say we only want to see information about individuals elected to the Senate in 2023. We could do the following:
+
+```{r, eval = T, echo = T}
+
+filter(nc_congress, branch == "Senate")
+
+```
+
+The first argument in the `filter()` command, as can be seen above, is the name of the data set. The second argument is the condition which we wish to satisfy for our subseting. So in this case, we asked R to only return observations where the variable `branch` was equal to "Senate".
+
+Often, we want to save this subset of our data set into a new object. To do so, we would use the `<-` operator as before. So, if we want to save this data into a new object called `nc_senate` we would do the following:
+
+```{r, eval = T, echo = T}
+
+nc_senate <- filter(nc_congress, branch == "Senate")
+
+```
+
+
+### Practice 
+
+Now you try! This time, filter for all representatives who are within the House of Representatives (labelled as "House" in the data set).
+
+```{r house, exercise = TRUE, exercise.lines = 5}
+
+
+```
+```{r house-hint-1}
+
+filter(___, branch == ___)
+
+```
+```{r house-hint-2}
+
+filter(nc_congress, branch == "House")
+
+```
+
+
+
+### The `select()` command
+
+This command allows us to subset our data set by column, or variable. That is, it allows us to only examine the variables that we wish. This is particularly useful if we have a data set with many columns, or variables, and we only need some of them.
+
+For example, say we are just interested in the name and party of our North Carolina members of Congress, and we want to save this in a new data set called `nc_congress_parties`. We would do the following:
+
+
+```{r, echo = T, eval = T}
+
+#create new df
+nc_congress_parties <- select(nc_congress, name, party)
+
+#return df and examine
+nc_congress_parties
+
+```
+
+
+We can also use the `:` operator to select multiple variables that are continguous (or next to one another). For example, say we wanted to inclue the variables `name`, `branch` and `party`. Because these variables are located next to one another in the data set, we can do the following:
+
+```{r, echo = T, eval = T}
+
+#select the three variables of interest
+select(nc_congress, name:party)
+
+```
+
+
+### Practice
+
+Now you try using the `select()` command. Create a new data set called `nc_districts` which includes the three variabels from the `nc_congress` data set: `name`, `branch`, and `district`.
+
+
+```{r district, exercise = TRUE, exercise.lines = 5}
+
+
+```
+```{r district-hint-1}
+
+nc_districts <- select(___, c(___))
+
+```
+```{r district-hint-2}
+
+#create the new df
+nc_districts <- select(nc_congress, name, branch, district)
+
+#check out the new df
+nc_districts
+
+```
+
+
+
+## Topic 2: Connecting `dplyr` Commands with `%>%`
+
+One of the main benefits of working with dplyr is that the package allows you to string commands together to effectively summarize your data. To do so, we use something called the pipe, which looks like this: `%>%`. 
+
+Within dplyr, all verbs (or commands) take a data frame as the first argument. Rather than forcing users to repeatedly use functions and feed in a new data frame as an argument each time, dplyr allows users to pipe the result of the past operation into the next. The best way to see this is via an example.
+
+
+Let's revisit some of our data filtering and selecting from the past example. What if our goal was to have a data frame with ONLY members of the House of Representatives, and we only wanted our data frame to have three variables: `name`, `branch`, and `district`. We would need to proceed in two steps, first filtering by the `branch` variable, and then selecting the columns of interest. We could also select, first -- in this case the order doesn't matter. We would proceed as follows:
+
+```{r, echo = T, eval = T}
+
+#first filter data
+step1 <- filter(nc_congress, branch == "House")
+
+#second select data
+step2 <- select(step1, name, branch, district)
+
+#view final data
+step2
+
+```
+
+But, with the `%>%` we can do this all in one step. See below:
+
+```{r, echo = T, eval = T}
+
+#first filter data
+with_dplyr <- nc_congress %>% #save into new object and pipe
+  filter(branch == "House") %>% #filter for House and then pipe
+  select(name, branch, district)
+  
+#check out data
+with_dplyr
+
+```
+
+
+So what happened above? First, we told R to create a new object called `with_dplyr`. We then told R to feed the result from the subsequent lines of code into that object via the `<-` operator. Then, we started with the `nc_congress` data, and piped that into the `filter` command with the `%>%` operator. We subsequently piped the resulting data after the `filter` command into the `select` operator. The result of all of this was saved into our object!
+
+### Summarizing
+
+Now, we are going to introduce a few other `dplyr` commands here which are particularly useful to use with the pipe, `%>%`. We are going to check out `group_by()` and `summarize()`, which work well together. 
+
+For example, let's say we want to know how Democrats and Republicans differ in terms of the number of years on average the representatives have spent in their current positions. We would proceed as follows:
+
+1. Use `group_by()` to group our data by `party` so that all subsequent calculations will be performed separately for Democrats and Republicans
+2. Use `summarize()` to create summary statistics of our data, in this case the mean
+
+```{r, echo = T, eval = T}
+
+mean_service <- nc_congress %>% #start with data 
+  group_by(party) %>% #group by the party of each rep
+  summarize(mean_service = mean(years)) #use summarize to calculate the mean
+
+#check out the result
+mean_service 
+  
+```
+
+And what do we see in the result? We see that among those who have been elected to Congress from North Carolina, Republicans seem to have been in their seats far longer than Democrats.
+
+We can make this a bit more complicated. What if we want to know this same number, but by party AND branch? We could add a second argument to the `group_by()` function:
+
+
+```{r, echo = T, eval = T}
+
+mean_service <- nc_congress %>% #start with data 
+  group_by(party, branch) %>% #group by the party AND branch
+  summarize(mean_service = mean(years)) #use summarize to calculate the mean
+
+#check out the result
+mean_service 
+  
+```
+
+Here, we can see that particularly in the House, Republicans have served longer. We do not have any data regarding Democrat Senators, because North Carolina does not have any.
+
+
+### Practice
+
+Now you try! We will incorporate into this exercise the `filter` function as well.
+
+Create a new object called `women_service`, which calculates the years of service for only female representatives by their party. The women officials are as follows: Alma Adams, Valerie Foushee, Virginia Foxx, Kathy Manning, and Deborah Ross.
+
+Note that to use `filter` in this case, you will need to use the `==` operator a few times in addition to the `|` (OR) operator. We have included some initial code to help guide you.
+
+```{r women_service, exercise = TRUE, exercise.lines = 12}
+
+#calculate summary stats
+___ <- ___ %>%
+  filter(name == ___ | name == ___ | 
+           name == ___ | name == ___ |
+           name == ___) %>% #filterby name
+  group_by(___) %>% #group by the party AND branch
+  summarize(___ = ___) #use summarize to calculate the mean
+
+# show result
+___
+
+```
+```{r women_service-hint-1}
+
+
+#calculate summary stats
+women_service <- nc_congress %>%
+  filter(name == "Alma Adams" | name == ___ | 
+           name == ___ | name == ___ |
+           name == ___) %>% #filterby name
+  group_by(party) %>% #group by the party AND branch
+  summarize(mean_service = mean(___)) #use summarize to calculate the mean
+
+# show result
+women_service
+
+
+```
+```{r women_service-hint-2}
+
+#calculate summary stats
+women_service <- nc_congress %>%
+  filter(name == "Alma Adams" | name == "Valerie Foushee" | 
+           name == "Virginia Foxx" | name == "Kathy Manning" |
+           name == "Deborah Ross") %>% #filterby name
+  group_by(party) %>% #group by the party AND branch
+  summarize(mean_service = mean(years)) #use summarize to calculate the mean
+
+# show result
+women_service
+
+
+```
+
