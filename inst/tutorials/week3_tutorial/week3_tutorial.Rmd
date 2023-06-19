@@ -1,0 +1,645 @@
+---
+title: "Tutorial for Week 3"
+output: 
+  learnr::tutorial:
+  progressive: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+tutorial_options(exercise.timelimit = 60)
+knitr::opts_chunk$set(error = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
+
+data(mtcars)
+```
+
+## Welcome
+
+In this tutorial, you will become acquainted with two-dimensional R objects. We will be learning about two types, called **matrices** (singular: matrix) and **data frames**. Primarily, we will be working with data frames as they are more flexible. 
+
+These types of data are 2D because they have both rows *and* column, while before we were working with just one-dimensional data which could be described as only a row *or* a column. For example, say we have some data about cars. A one-dimensional object may have looked just like a list of the names of the cars, like this:
+
+
+```{r, echo = F, eval = T}
+cars <- rownames(mtcars[1:5,])
+
+cars
+```
+
+
+But now with two-dimensional data, it will take on a more complex format. For example, below we now see those five car names, and each one corresponds to a **row** in our data. Along the top, we now see names for **column** which contain additional information about each car -- or row. For instance, we see that the Mazda Rx4 has 21 miles per gallon, while the Datsun 710 has 22.8
+
+```{r, echo = F, eval = T}
+head(mtcars[1:5, 1:5])
+```
+
+
+## Topic 1: Matrices
+
+A **martix** is an object in R in which 1) every element is the same type (e.g., all numbers or all characters), and 2) is arranged in a two-dimensional format.
+
+
+Because matrices only handle data of the same type, we will not be using them very much. But, it is important to understand what they are and become familiar with a few commands.
+
+
+In R, you can create a matrix using the command `matrix()` with the following syntax.
+
+```{r}
+matrix(data, nrow, ncol, byrow, dimnames)
+```
+
+Each of these arguments is as follows:
+
+* **data** is an input *vector* which will become all of the elements of the matrix
+* **nrow** is the number of rows to be created
+* **ncol** is the number of columns to be created
+* **byrow** is a logical statement where `TRUE` tells the command to arrange the input data by row
+* **dimname** are the names you will assign to the rows and columns
+
+Let's check out an example! First, we will create a matrix with the numbers 1-10. We will have two rows, and we will tell R to *not* arrange the data by row:
+
+```{r, eval = T}
+my_matrix1 <- matrix(c(1:10), nrow = 2, byrow = F) #create matrix
+
+my_matrix1 #return object
+```
+
+
+Now, let's see the difference if we tell R to arrange by row. What happens?
+
+```{r, eval = T}
+my_matrix2 <- matrix(c(1:10), nrow = 2, byrow = T) #create matrix
+
+my_matrix2 #return object
+```
+
+
+Above, we also told R to create two rows. What if we want 5 rows instead?
+
+```{r, eval = T}
+my_matrix3 <- matrix(c(1:10), nrow = 5, byrow = T) #create matrix
+
+my_matrix3 #return object
+```
+
+Now you can see we will have 5 rows of data, and because we are only dealing with the numbers 1-10, we will have two columns.
+
+### Practice
+
+Now you try! Create a matrix called `matrix1`. Fill this matrix with numbers 1-81. The matrix should have 9 rows.
+
+```{r matrixex_1, exercise = TRUE}
+
+```
+
+```{r matrixex_1-hint-1}
+
+matrix1 <- matrix(__________) #first create the matrix
+
+matrix1 #then return the matrix
+
+```
+
+```{r matrixex_1-hint-2}
+matrix1 <- matrix(c(______), nrow = _____, byrow = ____) #create matrix
+
+matrix1 #return object
+
+```
+```{r matrixex_1-hint-3}
+matrix1 <- matrix(c(1:81), nrow = 9, byrow = T) #create matrix
+
+matrix1 #return object
+```
+
+
+
+It is not so important for us to dive into this more right now, as we will not be relying on matrices too much in this class. So, let's move onto data frames!
+
+
+## Topic 2: Data Frames
+
+Data frames are also 2D types of data, however they are more flexible than matrices. Instead of only being able to handle *one* type of data, they can handle multiple types, including numbers, text, and Boolean data types.
+
+To create data frames, we will use a new command: `data.frame()`. The `data.frame()` function works by accepting a series of vectors and binding them together to create, you guessed it, a data frame! Let's see the example below to understand a bit better.
+
+
+Below, the code creates a data frame called `newspaper_data`. This data frame contains information about four of the top newspapers in the United States. It has three variables, or columns: the name of the newspaper (`name`), the number of subscribers in 2019 (`n_subscribe`), and the location of the headquarters (`head_q`).
+
+```{r, eval = T}
+
+#create data frame
+newspaper_data <- data.frame(name = c("USA Today", "Wall Street Journal",
+                                      "The New York Times", "New York Post"),
+                             #first column/variable
+                             
+                             n_subscribe = c(1621091, 1011200, 483701, 426129),
+                             #second column/variable
+                             
+                             head_q = c("Virginia", "New York", "New York",
+                                        "New York")
+                             #third column/variable
+                             
+                             ) #close the command
+
+
+
+#return the data frame
+newspaper_data
+
+```
+
+
+Notice that each of the elements that the `data.frame()` function accepts is really just a vector. So, alternatively, you could create the same data frame in the following way:
+
+```{r, eval = T}
+
+#create vectors for the variables
+name <- c("USA Today", "Wall Street Journal", "The New York Times",
+          "New York Post")
+n_subscribe <- c(1621091, 1011200, 483701, 426129)
+head_q <- c("Virginia", "New York", "New York", "New York")
+
+#create data frame
+newspaper_data <- data.frame(name = name, 
+                             #assign name variable to the name vector
+                             
+                             n_subscribe = n_subscribe,
+                             
+                             #assign n_subscribe variable to corresponding vector
+                             head_q = head_q
+                             #assign head_q variable to corresponding vector
+                             )
+
+#return the data frame
+newspaper_data
+
+```
+
+This will only work if each of those vectors has the same *number of elements*, which translates to the number of rows in the data frame.
+
+### Summarizing the Data Frame
+
+Now, say you want to examine that new data frame without returning the whole thing. A useful command here would be the `summary()` command. This command returns information about each of the variables. In the case of the character variables, it will tell you what class they are (character vs. numeric, for example) and the length of that variable (how many rows). In the case of numeric variables, it will give you useful information such as the minimum value, the maximum, etc. See below!
+
+```{r, eval = T}
+summary(newspaper_data) #summarize the data
+
+```
+
+Further, sometimes you will have a data frame with a *lot* of rows. In those cases, it may not be practice to take a look at the full object. Instead, you can use the command `head()` to just see the first few rows of the data frame. In the case of the `newspaper_data` object, we only have a few rows. But, let's use this to summarize the mtcars data, which is some built in data in R about cars (we looked at in the beginning of this tutorial):
+
+
+```{r, eval = T}
+head(mtcars) #return the first few rows
+```
+
+
+In addition, it can be useful to query R about how many rows you have (or observations), how many columns (or variables), or the full dimensions of your data frame.
+
+To ask R how many rows (or observations) or data has, we can use the command `nrow()`. This command accepts the name of the data frame, and returns the number of rows.
+```{r, eval = T}
+nrow(mtcars) #has 32 observations
+```
+
+There is a similar function for the number of columns -- or variables. This is `ncol()`.
+
+```{r, eval = T}
+ncol(mtcars) #has 11 variables
+```
+
+
+Finally, we can use `dim()` to ask R how many rows *and* columns a data frame has.
+
+```{r, eval = T}
+dim(mtcars) #32 rows, 11 columns
+```
+
+
+### Practice
+
+Your turn! Create a new data frame called `large_cities` which will contain information about the top five largest cities in the United States. This data frame will have four variables:
+
+* `city`: the name of the city
+* `state`: the state where that city is located
+* `population`: the population of that city as of 2020
+* `mayor`: the name of the mayor of that city in 2023
+
+Here is the information for each of the cities of interst:
+
+* New York City: State = New York, Population = 8,622,357, Mayor = Eric Adams
+* Los Angeles: State = California, Population = 4,085,014, Mayor = Karen Bass
+* Chicago: State = Illinois, Population = 2,670,406, Mayor = Lori Lightfoot
+* Houston: State = Texas, Population = 2,378,146, Mayor = Sylvester Turner
+
+After you create this data frame, use `dim()` to check that your data frame has the correct number of rows and columns: 4 and 4!
+
+
+```{r mayor_ex, exercise = TRUE}
+
+
+
+
+```
+```{r mayor_ex-hint-1}
+
+#first: create vectors for the variables - you can also just place these
+# directly into the data.frame() function
+
+
+#second: specify the variables in the data.frame() function
+
+
+
+#last: return your object
+
+#check dimensions
+
+```
+```{r mayor_ex-hint-2}
+
+#first: create vectors for the variables - you can also just place these
+# directly into the data.frame() function
+
+city <- c(___)
+state <- c(___)
+population <- c(___)
+mayor <- c(___)
+
+
+#specify the variables in the data.frame() function
+large_cities <- data.frame(city = ___,
+                             state = ___,
+                             population = ___,
+                             mayor = ___)
+
+
+#return your object
+large_cities
+
+#check dimensions
+
+```
+```{r mayor_ex-hint-3}
+#create vectors for the variables
+city <- c("New York City", "Los Angeles", "Chicago", "Houston")
+state <- c("New York", "California", "Illinois", "Texas")
+population <- c(8622357, 4085014, 2670406, 2378146)
+mayor <- c("Eric Adams", "Karen Bass", "Lori Lightfoot", "Sylvester Turner")
+
+
+#create data frame
+large_cities <- data.frame(city = city,
+                             state = state,
+                             population = population,
+                             mayor = mayor)
+#return the data frame
+large_cities
+
+#check dimensions
+dim(large_cities)
+```
+
+
+## Topic 3: Indexing Data Frames
+
+
+Just like with vectors, it can be useful with data frames to select certain element(s) of our data. Before with vectors, we only needed to indicate the name of the element or its place within the vector using `[]`. Now, with data frames, we have to be cognizant of both the element(s) place in terms of rows AND columns.
+
+The syntax for indexing is as follows:
+
+`data_frame_name[row, column]`
+
+To properly index, you MUST follow this order -- rows first, columns second. You cannot switch the order and index first by column and then row. To help you remember the order, a useful mnemonic device is to remember Roman Catholic (R always comes before C!).
+
+As with vectors, you can index both by elements' names or place within a dataframe. Again, we suggest typically using names as it might be difficult to exactly determine an element's location within the data frame. However, there are cases where both are useful.
+
+Let's return to the previous example where we looked at the largest cities in the U.S. We are going to create our data frame again, and then index a few elements to demonstrate how it works.
+
+```{r, eval = T}
+# First: Create the data frame
+
+#create vectors for the variables
+city <- c("New York City", "Los Angeles", "Chicago", "Houston")
+state <- c("New York", "California", "Illinois", "Texas")
+population <- c(8622357, 4085014, 2670406, 2378146)
+mayor <- c("Eric Adams", "Karen Bass", "Lori Lightfoot", "Sylvester Turner")
+
+
+#create data frame
+large_cities <- data.frame(city = city,
+                             state = state,
+                             population = population,
+                             mayor = mayor)
+
+
+
+# Now - index the data frame:
+
+#### 1) index to only look at data about population
+large_cities[ , "population"]
+
+
+### 2) index to look at the population for the first city in our data frame
+large_cities[1, "population"]
+
+
+### 3) index to look only at city and mayor
+large_cities[ , c("city", "mayor")]
+
+```
+
+
+So, there are a few things to note here.
+
+ * First: if you are ONLY indexing by row OR column (such as in examples 1 and 3), you leave the other corresponding space in the brackets blank. So, in example one, we have `large_cities[ , "population"]`. This effectively tells R to return ALL rows, but only the column corresponding to population
+ * Second: You can combine indexing by number and row or column name. In the case of the current data frame, we have column names (variables), but we do not have row names. So, in the second example we instructed R to return information on population, but only for the first row or observation.
+ * Third: Just like with vectors, we can index by multiple names or numbers. In the third example, we used the `c()` command to return information on both city name and mayor name for all observations in our data set.
+ 
+ 
+### Practice
+
+Now you try. The below code creates a data frame, called `pres_fave` for you about a few presidents' favorite flowers and plants. This is fictitious information. Using `[]`, index the data frame in the following ways:
+
+1) Return only the `president` and `fruit` columns
+2) Return the value for `flower` from the 5th observation
+3) Return the 1st, 3rd, and 6th observations
+
+```{r pres_fave, exercise = TRUE}
+
+pres_fave <- data.frame(president = c("Obama", "Reagan", "Carter", "Kennedy",
+                                      "Eisenhower", "Lincoln"),
+                        flower = c("Tulip", "Hydrangea", "Petunia", "Allium",
+                                   "Crocus", "Lotus"),
+                        fruit = c("Apple", "Banana", "Apple", "Peach",
+                                  "Blueberry", "Pear"))
+
+
+
+# 1) President and Fruit
+
+
+#2) Flower and fifth observation
+
+
+#3) 1st, 3rd, 6th observations
+
+
+
+
+```
+```{r pres_fave-hint-1}
+
+# 1) President and Fruit
+pres_fave[]
+
+#2) Flower and fifth observation
+pres_fave[]
+
+
+#3) 1st, 3rd, 6th observations
+pres_fave[]
+
+```
+```{r pres_fave-hint-2}
+
+# 1) President and Fruit
+pres_fave[ , c()]
+
+#2) Flower and fifth observation
+pres_fave[___,"flower"]
+
+
+#3) 1st, 3rd, 6th observations
+pres_fave[c(___, ___, ___), ]
+
+```
+```{r pres_fave-hint-3}
+
+# 1) President and Fruit
+pres_fave[ , c("president", "fruit")]
+
+#2) Flower and fifth observation
+pres_fave[5,"flower"]
+
+
+#3) 1st, 3rd, 6th observations
+pres_fave[c(1, 3, 6), ]
+
+```
+
+
+
+## Topic 3: Indexing Data Frames with Conditionals
+
+Another important skill for indexing data frames is using something called **conditional statements**. These are statements which evaluate if a certain *condition* is met, and returns data based on satisfying this condition. 
+
+For example, say we have our same data about presidents and their favorite flowers and fruits. We'll add a few more observations to that than before. First, run the following line of code which creates our data frame. Then check it out.
+
+```{r pres_fave2, exercise = T}
+
+#create data frame
+pres_fave <- data.frame(president = c("Obama", "Reagan", "Carter", "Kennedy",
+                                      "Eisenhower", "Lincoln", "Nixon", 
+                                      "Roosevelt", "Jackson"),
+                        flower = c("Tulip", "Hydrangea", "Petunia", "Allium",
+                                   "Crocus", "Lotus", "Petunia", "Allium",
+                                   "Crocus"),
+                        fruit = c("Apple", "Banana", "Apple", "Peach",
+                                  "Blueberry", "Pear", "Tangerine", "Banana",
+                                  "Pear"))
+
+#check out data frame
+pres_fave
+```
+
+With this, we can start indexing. To index a data frame using conditions, it is important to keep the syntax in mind. We will be adapting syntax we used before, which was:
+
+`data_frame_name[row, column]`
+
+But now, we'll be more specific. For example, what if we wanted to see all of the observations with presidents who have crocus as their favorite flower? We would do the following:
+
+```{r pres_fave3, exercise.setup = "pres_fave2", exercise = T}
+# select data with favorite flower as crocus
+pres_fave[pres_fave$flower == "Crocus", ]
+
+```
+
+Above, the syntax was as follows:
+
+`data_frame_name[data_frame$variable_name CONDITION, column]`
+
+In this case, the condition was: is the flower variable equal to "crocus", `TRUE` or `FALSE`? If `TRUE` return that variable. We did not have any parameters on column values, so R returned all columns (or variables) in our data frame for each of the observations that satisfied this condition.
+
+The statement above is only one type of condition available to us. In R, there are six essential conditional operators:
+
+1. `==`: is equal to
+2. `!=`: is not equal to
+3. `|`: or
+4. `&`: and
+5. `>` and `>=`: greater than, greater than or equal to
+6. `<` and `<=`: less than, less than or equal to
+
+
+Let's practice using some others. 
+
+For example, what if we wanted to see all presidents with the favorite fruit banana OR apple?
+
+```{r pres_fave4, exercise.setup = "pres_fave2", exercise = T}
+# select data with favorite fruit as banana or apple
+pres_fave[pres_fave$fruit == "Banana" | pres_fave$fruit == "Apple", ]
+
+```
+
+And those whose favorite flower is Allium AND favorite fruit is pear?
+
+```{r pres_fave5, exercise.setup = "pres_fave2", exercise = T}
+# select data with favorite flower as allium and fruit as pear
+pres_fave[pres_fave$flower == "Allium" & pres_fave$fruit == "Pear", ]
+
+```
+
+No one has that combination!
+
+Now, say we wanted to answer a more specific question. For all presidents whose favorite flower is Petunia, what is their favorite fruit? Here, we will both index by row AND column. We will ask R to only show us values from the fruit variable for those whose favorite flower is Petunia. 
+
+```{r pres_fave6, exercise.setup = "pres_fave2", exercise = T}
+# show favorite fruit for all presidents with the favorite flower Petunia
+pres_fave[pres_fave$flower == "Petunia", "fruit"]
+
+```
+
+
+### Practice 
+
+Now, we are going to create a new data frame and practice indexing with conditionals again. Now, we are going to work with additional conditional statements, such as `<` (less than) and `>` (greater than), in addition to others. Don't forget to reference the list of operators above when working! The below code will give you a framework to start working with.
+
+First, you will create a new data frame, called `eu_info` with 4 variables about a selection of members of the European Union
+
+1. `country`: Austria, Bulgaria, Croatia, Cyprus, Denmark, Estonia, Finland
+2. `join_year`: 1995, 2007, 2013, 2004, 1973, 2004, 1995
+3. `population`: 8926000, 6916548, 4036355, 896000, 5833883, 1330068, 5527493
+4. `currency`: Euro, Lev, Euro, Euro, Krone, Euro, Euro
+
+Then, you will perform the following tasks using conditionals and indexing:
+
+1. Index `eu_info` to only show observations for those who joined in the year 2007 or after
+2. Index `eu_info` to only show observations for countries that use the Euro as their currency
+3. Index `eu_info` to only show observations for countries with a population under 6 million AND who joined before 2010
+4. *Challenge*: index `eu_info` to show only the currency name for the following countries: Austria, Bulgaria, Denmark
+
+
+```{r eu_ex, exercise = TRUE}
+
+#create data frame
+
+
+# Index task 1
+
+
+#Index task 2
+
+
+#Index task 3
+
+
+#Index task 4
+
+
+```
+```{r eu_ex-hint-1}
+
+#create data frame
+eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
+                                  "Denmark", "Estonia", "Finland"),
+                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
+                      population: c(8926000, 6916548, 4036355, 896000, 5833883,
+                                    1330068, 5527493),
+                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
+                                   "Euro", "Euro"))
+
+# Index task 1
+
+
+#Index task 2
+
+
+#Index task 3
+
+
+#Index task 4
+
+
+```
+```{r eu_ex-hint-2}
+
+#create data frame
+eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
+                                  "Denmark", "Estonia", "Finland"),
+                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
+                      population = c(8926000, 6916548, 4036355, 896000, 5833883,
+                                    1330068, 5527493),
+                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
+                                   "Euro", "Euro"))
+
+# Index task 1
+eu_info[eu_info$join_year >= ___, ]
+
+
+#Index task 2
+eu_info[eu_info$currency == ___, ]
+
+
+#Index task 3
+eu_info[___ & ___, ]
+
+
+#Index task 4
+eu_info[___ | ___ | ___, ___]
+
+
+```
+```{r eu_ex-hint-3}
+
+#create data frame
+eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
+                                  "Denmark", "Estonia", "Finland"),
+                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
+                      population = c(8926000, 6916548, 4036355, 896000, 5833883,
+                                    1330068, 5527493),
+                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
+                                   "Euro", "Euro"))
+
+# Index task 1
+eu_info[eu_info$join_year >= 2007, ]
+
+
+#Index task 2
+eu_info[eu_info$currency == "Euro", ]
+
+
+#Index task 3
+eu_info[eu_info$population <6000000 & eu_info$join_year < 2010, ]
+
+
+#Index task 4
+eu_info[eu_info$country == "Austria" | eu_info$country == "Bulgaria" |
+          eu_info$country == "Denmark", "currency"]
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
