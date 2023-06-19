@@ -298,3 +298,27 @@ women_service
 
 ```
 
+## Comprehension Quiz
+
+Prior to taking the below quiz, please solve the following problem. You will then report your answer in the quiz.
+
+From the `nc_congress` data, create a new object called `junior_members` which only examines members of the NC congress who have served for less than 6 years. What is the mean number of years of service for both Republican and Democratic junior members? 
+
+```{r junior_members, exercise = TRUE, exercise.lines = 10}
+
+
+```
+
+```{r, eval = F, echo = F}
+# Answers - do not show in tutorial
+junior_members <- nc_congress %>%
+  filter(years < 6) %>%
+  group_by(party) %>%
+  summarize(mean_service = mean(years, na.rm = TRUE))
+
+junior_members # Dem = 0.67, Rep = 2.00
+
+
+```
+
+[Report your answer via this quiz](https://unc.az1.qualtrics.com/jfe/form/SV_b2vD9CBylRYI2WO)
