@@ -107,7 +107,7 @@ Nice - it looks like it worked.
 
 ### Practice
 
-Now your turn! Perform the same task as above, but now fix the "taiping rebellion" and the "hundred Years' War" to have uniform capitalization. That is, they should read "Taiping Rebellion" and "Hundred Years' War", respectively.
+Now your turn! Perform the same task as above, but now fix the "taiping rebellion" to have uniform capitalization. That is, it should read "Taiping Rebellion".
 
 ```{r recode_1, exercise = TRUE, exercise.lines = 10}
 
@@ -460,6 +460,10 @@ Next we tell R to return the value "medium" if `votes$vote_total < 800000 & vote
 
 
 ## Comprehension Quiz
+
+Please complete the quiz to evaluate your comprehension using the following link:
+
+[Link to quiz here](https://unc.az1.qualtrics.com/jfe/form/SV_cN1ZItiB76g3Yge)
 
 
 

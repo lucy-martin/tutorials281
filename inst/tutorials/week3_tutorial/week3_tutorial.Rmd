@@ -36,92 +36,10 @@ head(mtcars[1:5, 1:5])
 ```
 
 
-## Topic 1: Matrices
 
-A **martix** is an object in R in which 1) every element is the same type (e.g., all numbers or all characters), and 2) is arranged in a two-dimensional format.
+## Topic 1: Data Frames
 
-
-Because matrices only handle data of the same type, we will not be using them very much. But, it is important to understand what they are and become familiar with a few commands.
-
-
-In R, you can create a matrix using the command `matrix()` with the following syntax.
-
-```{r}
-matrix(data, nrow, ncol, byrow, dimnames)
-```
-
-Each of these arguments is as follows:
-
-* **data** is an input *vector* which will become all of the elements of the matrix
-* **nrow** is the number of rows to be created
-* **ncol** is the number of columns to be created
-* **byrow** is a logical statement where `TRUE` tells the command to arrange the input data by row
-* **dimname** are the names you will assign to the rows and columns
-
-Let's check out an example! First, we will create a matrix with the numbers 1-10. We will have two rows, and we will tell R to *not* arrange the data by row:
-
-```{r, eval = T}
-my_matrix1 <- matrix(c(1:10), nrow = 2, byrow = F) #create matrix
-
-my_matrix1 #return object
-```
-
-
-Now, let's see the difference if we tell R to arrange by row. What happens?
-
-```{r, eval = T}
-my_matrix2 <- matrix(c(1:10), nrow = 2, byrow = T) #create matrix
-
-my_matrix2 #return object
-```
-
-
-Above, we also told R to create two rows. What if we want 5 rows instead?
-
-```{r, eval = T}
-my_matrix3 <- matrix(c(1:10), nrow = 5, byrow = T) #create matrix
-
-my_matrix3 #return object
-```
-
-Now you can see we will have 5 rows of data, and because we are only dealing with the numbers 1-10, we will have two columns.
-
-### Practice
-
-Now you try! Create a matrix called `matrix1`. Fill this matrix with numbers 1-81. The matrix should have 9 rows.
-
-```{r matrixex_1, exercise = TRUE}
-
-```
-
-```{r matrixex_1-hint-1}
-
-matrix1 <- matrix(__________) #first create the matrix
-
-matrix1 #then return the matrix
-
-```
-
-```{r matrixex_1-hint-2}
-matrix1 <- matrix(c(______), nrow = _____, byrow = ____) #create matrix
-
-matrix1 #return object
-
-```
-```{r matrixex_1-hint-3}
-matrix1 <- matrix(c(1:81), nrow = 9, byrow = T) #create matrix
-
-matrix1 #return object
-```
-
-
-
-It is not so important for us to dive into this more right now, as we will not be relying on matrices too much in this class. So, let's move onto data frames!
-
-
-## Topic 2: Data Frames
-
-Data frames are also 2D types of data, however they are more flexible than matrices. Instead of only being able to handle *one* type of data, they can handle multiple types, including numbers, text, and Boolean data types.
+Data frames are a flexible, 2D form of data. They are able to handle multiple types of data in the same object, including numbers, text, and Boolean data types.
 
 To create data frames, we will use a new command: `data.frame()`. The `data.frame()` function works by accepting a series of vectors and binding them together to create, you guessed it, a data frame! Let's see the example below to understand a bit better.
 
@@ -234,31 +152,30 @@ Here is the information for each of the cities of interst:
 * Chicago: State = Illinois, Population = 2,670,406, Mayor = Lori Lightfoot
 * Houston: State = Texas, Population = 2,378,146, Mayor = Sylvester Turner
 
-After you create this data frame, use `dim()` to check that your data frame has the correct number of rows and columns: 4 and 4!
+After you create this data frame, use `dim()` to check that your data frame has the correct number of rows and columns: 4 and 4! You have been provided with some code below to get you stared.
 
 
 ```{r mayor_ex, exercise = TRUE}
 
+#first: create vectors for the variables - you can also just place these
+# directly into the data.frame() function
+city <- c(___)
+state <- c(___)
+population <- c(___)
+mayor <- c(___)
+
+#second: specify the variables in the data.frame() function
+large_cities <- data.frame(___)
 
 
+#return your object
+___
+
+#check dimensions
+___(___)
 
 ```
 ```{r mayor_ex-hint-1}
-
-#first: create vectors for the variables - you can also just place these
-# directly into the data.frame() function
-
-
-#second: specify the variables in the data.frame() function
-
-
-
-#last: return your object
-
-#check dimensions
-
-```
-```{r mayor_ex-hint-2}
 
 #first: create vectors for the variables - you can also just place these
 # directly into the data.frame() function
@@ -277,9 +194,10 @@ large_cities <- data.frame(city = ___,
 
 
 #return your object
-large_cities
+___
 
 #check dimensions
+___(___)
 
 ```
 ```{r mayor_ex-hint-3}
@@ -303,7 +221,7 @@ dim(large_cities)
 ```
 
 
-## Topic 3: Indexing Data Frames
+## Topic 2: Indexing Data Frames
 
 
 Just like with vectors, it can be useful with data frames to select certain element(s) of our data. Before with vectors, we only needed to indicate the name of the element or its place within the vector using `[]`. Now, with data frames, we have to be cognizant of both the element(s) place in terms of rows AND columns.
@@ -431,7 +349,6 @@ pres_fave[c(1, 3, 6), ]
 ```
 
 
-
 ## Topic 3: Indexing Data Frames with Conditionals
 
 Another important skill for indexing data frames is using something called **conditional statements**. These are statements which evaluate if a certain *condition* is met, and returns data based on satisfying this condition. 
@@ -536,7 +453,7 @@ Then, you will perform the following tasks using conditionals and indexing:
 #create data frame
 
 
-# Index task 1
+#Index task 1
 
 
 #Index task 2
@@ -632,11 +549,88 @@ eu_info[eu_info$country == "Austria" | eu_info$country == "Bulgaria" |
 ```
 
 
+## Topic 4: Matrices
+
+A **martix** is another 2D type of data, however matrices are not as flexible as data frames and we will not use them very often. However, they are still important to uerstand! Unlikes data frames, matrices can only handle data where every element is the same type (e.g., all numbers or all characters).
+
+In R, you can create a matrix using the command `matrix()` with the following syntax.
+
+```{r}
+matrix(data, nrow, ncol, byrow, dimnames)
+```
+
+Each of these arguments is as follows:
+
+* **data** is an input *vector* which will become all of the elements of the matrix
+* **nrow** is the number of rows to be created
+* **ncol** is the number of columns to be created
+* **byrow** is a logical statement where `TRUE` tells the command to arrange the input data by row
+* **dimname** are the names you will assign to the rows and columns
+
+Let's check out an example! First, we will create a matrix with the numbers 1-10. We will have two rows, and we will tell R to *not* arrange the data by row:
+
+```{r, eval = T}
+my_matrix1 <- matrix(c(1:10), nrow = 2, byrow = F) #create matrix
+
+my_matrix1 #return object
+```
 
 
+Now, let's see the difference if we tell R to arrange by row. What happens?
+
+```{r, eval = T}
+my_matrix2 <- matrix(c(1:10), nrow = 2, byrow = T) #create matrix
+
+my_matrix2 #return object
+```
 
 
+Above, we also told R to create two rows. What if we want 5 rows instead?
 
+```{r, eval = T}
+my_matrix3 <- matrix(c(1:10), nrow = 5, byrow = T) #create matrix
+
+my_matrix3 #return object
+```
+
+Now you can see we will have 5 rows of data, and because we are only dealing with the numbers 1-10, we will have two columns.
+
+### Practice
+
+Now you try! Create a matrix called `matrix1`. Fill this matrix with numbers 1-81. The matrix should have 9 rows.
+
+```{r matrixex_1, exercise = TRUE}
+
+```
+
+```{r matrixex_1-hint-1}
+
+matrix1 <- matrix(__________) #first create the matrix
+
+matrix1 #then return the matrix
+
+```
+
+```{r matrixex_1-hint-2}
+matrix1 <- matrix(c(______), nrow = _____, byrow = ____) #create matrix
+
+matrix1 #return object
+
+```
+```{r matrixex_1-hint-3}
+matrix1 <- matrix(c(1:81), nrow = 9, byrow = T) #create matrix
+
+matrix1 #return object
+```
+
+
+It is not so important for us to dive into this more right now, as we will not be relying on matrices too much in this class.
+
+## Comprehension Quiz
+
+Please complete the quiz to evaluate your comprehension using the following link:
+
+[Link to quiz here](https://unc.az1.qualtrics.com/jfe/form/SV_0URj5nofqDkdBEa)
 
 
 
