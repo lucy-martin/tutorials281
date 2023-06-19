@@ -26,4 +26,10 @@ You can then run individual tutorials on your local machine by running the follo
 ```{r}
 learnr::run_tutorial("TUTORIAL_NAME", package = "tutorials281")
 ```
-Tutorials correspond to the name of each subfolder within the `inst` directory.
+Tutorials correspond to the name of each subfolder within the `inst` directory. They are as follows:
+
+* week1_tutorial
+* week2_tutorial
+* week3_tutorial
+* week4_tutorial
+* week5_tutorial
