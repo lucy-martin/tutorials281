@@ -9,7 +9,7 @@ install.packages("learnr")
 library(learnr)
 ```
 
-To then manually install the most recent version of the `tutorials281`, you must first ensure you have the latest version of devtools installed:
+To then manually install the most recent version of the `tutorials281`, you must first ensure you have the latest version of `devtools` installed:
 
 ```{r}
 install.packages("devtools")
