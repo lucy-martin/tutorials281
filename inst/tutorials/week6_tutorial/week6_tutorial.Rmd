@@ -1,0 +1,192 @@
+---
+title: "Tutorial for Week 5"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(knitr)
+#library(tidyverse)
+library(dplyr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+
+# set up data for world values survey
+
+world_values <- read.csv("wave_7_wvs.csv") %>%
+  select(Q64, Q65, Q69, Q71, Q260, Q262, Q269, Q287) %>% 
+  rename(conf_churches = Q64,
+         conf_armforces = Q65, 
+         conf_police = Q69,
+         conf_govt = Q71,
+         sex = Q260,
+         age = Q262,
+         citizen = Q269,
+         class = Q287)
+
+world_values[world_values == -5] <- NA
+world_values[world_values == -4] <- NA
+world_values[world_values == -2] <- NA
+world_values[world_values == -1] <- NA
+```
+
+
+## Welcome to Data Visualization!
+
+This week, we will learn how to visualize our data. That is, we will learn how to examine data via graphs and figures. There are many ways to visualize data, and this often depends on the variables we are interested in, such as if they are continuous or discrete. 
+
+The main package we will use to visualize data is called `ggplot2`, which is part of the tidyverse. Our skills in using `dplyr` and the `tidyverse` will come in handy here, as we often need to manipulate and summarize our data before visualizing it.
+
+Note that to use `ggplot2` on your device, you will need to install and load its library. You can do so by specifically installing it and loading its library. However, because it is also part of the larger `tidyverse`, it is installed and loaded when you read in the tidyverse as well!
+
+For example, you can do the following:
+
+
+```{r, eval = F, echo = T}
+
+library(tidyverse) #note here you do not need quotes
+
+```
+
+Note that you do not need to install the library for the tidyverse on your machine since we already did so last week. OR you can do the following:
+
+
+```{r, eval = F, echo = T}
+
+install.packages("ggplot2")
+
+library(ggplot2) #note here you do not need quotes
+
+```
+
+
+
+
+## Topic 1: Understanding the Basics of Data Visualization
+
+When visualizing data, it is important to understand that there are **many** different types of graphs and figures that you can use. We will cover a few types here.
+
+# Histogram
+
+We use **histograms** to plot the distribution of a variable. That is to say, the frequency of different values of that variable. For example, the below histogram from the [SAS blog](https://blogs.sas.com/content/iml/2019/03/04/visualize-sat-scores-nc.html) shows us the distribution of SAT scores in North Carolina high schools. We can see from this plot that most students in the class of 2018 got a score of about 1100. 
+
+<iframe src="https://drive.google.com/file/d/1iEstpnb5j1T-FT267_oHs8PF5O4qoedQ/preview" width="640" height="480" allow="autoplay"></iframe>
+
+Importantly, histograms are used for continuous data. The main variable of interest -- shown on the x axix -- is divided into "bins" or ranges of values. In this case, our main variable of interest is the SAT score. The creator of this graph created bins for each range of scores, and plotted the relative frequency of students who acheived these scores. 
+
+# Bar Graphs
+
+Next we have bar graphs, or bar charts. These are commonly confused with histograms, but they are very different. While we use histograms to plot continuous data, bar graphs are used for plotting discrete, or categorical, variables. For example, the below graphic comes from the AmericasBarometer's Assessment of [Satisfaction with Public School's in Latin America](https://www.vanderbilt.edu/lapop/insights/IO958en.pdf), and shows how the percentage of individuals satisfied with public schools varies across countries. On the x-axis we have different countries (represented by their two-letter abbreviation). The y-axis instead corresponds to the percentage of individuals who reported being satisfied. 
+
+<iframe src="https://drive.google.com/file/d/1Ncr5nNAtLroaPk6hq_xjphyWtwgR4-oH/preview" width="640" height="480" allow="autoplay"></iframe>
+
+
+# Scatter Plots
+
+Scatter plots help us visualize two distinct continuous variables. Each dot represents an observation, which corresponds to its value on the x and y axes. For example, the plot below from [The World Bank's Atlast of Sustainabile Development Goals (2023)](https://datatopics.worldbank.org/sdgatlas/goal-1-no-poverty), shows us the relationship between GDP (gross domestic prodcut) per captia (on the x axis) and the poverty rate (on the y axis) across a variety of countries. Each dot represents a country, in this case. We can see from this plot that, in general, countries with more extreme poverty tend to have lower levels of GDP .
+
+<iframe src="https://drive.google.com/file/d/1cGoI6PswHHi9R2SAMo_MOuK3M-1G-vcX/preview" width="640" height="400" allow="autoplay"></iframe>
+
+
+# Line Graph
+
+Line graphs are another means by which to plot continuous data. They are often useful to plot trends in variables. For example, the following graphic comes from the [Pan American Health Organization](https://opendata.paho.org/en/core-indicators/visualizations) and examines how the total percent of the population living in urban areas in Canada and the United States has grown over time. On the x axis, we have year (a continuous variable, in this case) and on the y axis we have the % of the population that is urban.
+
+<iframe src="https://drive.google.com/file/d/1nMasKnkNHyDrnQQkmyDW1TzjPkotO4dY/preview" width="640" height="360" allow="autoplay"></iframe>
+
+Importantly, this line graph also contains some categorical information -- that is, country! Across many types of visualizations, we can incorporate things like color to help us capture categorical variables as well. So here, the authors use two different colored lines to include two distinct countries.
+
+
+# Pie Chart
+
+While there are many more types of ways to visualize data, we will conclude this introduction with pie charts. Pie charts are circle graphs where each slice represents a part of the whole. They help us to illustrate proportions of a whole. For example, the below graphic comes from an analysis of race and religion in Politcs published in [The Washington Post](https://www.washingtonpost.com/news/the-fix/wp/2012/09/10/the-politics-of-race-and-religion-in-two-pie-charts/). It breaks down the religious identification and race of Republicans in 2012. It shows us, for example, that out of all Republicans included in this data, 34 percent identify as both white and evangelical Protestant. 
+
+<iframe src="https://drive.google.com/file/d/19XJZMb_gM2kUz3j2KpcZ1iY_2L_eFa7r/preview" width="640" height="480" allow="autoplay"></iframe>
+
+
+# Choosing the appropriate type of graph
+
+Now that we have a few types of graphs under our belts, it is importan to understand how we decide which type of data visualization to use. The following will help you to make this decision as you visualize your own data:
+
+- What type of data am I plotting on each axis? Discrete or continuous?
+- What relationship am I trying to show?
+- What is the simplest way for me to convey this relationship?
+
+
+
+
+
+## Topic 2: Using ggplot2
+
+To plot data in R, we will be using the `ggplot2` package. But before we jump in there, it is essential to note that very little data is ready to be plotted from the get go. Often, we will need to summarize our data first using `dplyr` before we plot. Never forget this! 
+
+# Plotting confidence in churches by respondent sex
+
+We're going to illustrate how to use `ggplot2` with an example. Today, we'll be using the World Values Survey, which here is saved as `world_values`. We have close to 95000 observations of individuals across the world about their opinions regarding government, trust in institutions, and their values. Let's say we are interested in examining how confidence in churches by the sex of respondents.
+
+First, let's take a look at our data:
+
+```{r}
+
+summary(world_values)
+
+```
+
+Okay, looks like we have a few different variables here which capture confidence, in addition to respondent sex, age, whether or not they are a citizen, and their socioeconomic class. First, let's recode `sex` so that it is easier to understand. According to the survey, 1 is Male and 2 is Female. In this case, we do not have a variable which captures gender identification, unfortunately. 
+
+
+```{r}
+
+world_values$sex <- ifelse(world_values$sex == 1, "Male",
+                           ifelse(world_values$sex == 2, "Female", NA))
+
+```
+
+Great. The codebook also tells us that for all confidence questions, higher values (in this case, a maximum of 4) corresponds to higher confidence, while lower values correspond to lower confidence.
+
+What would be the best place to plot the relationship between these variables? Well, first we should probably consider that we need to calculate an *average level of trust* in churches for each sex. We can do so easily using dplyr:
+
+
+```{r}
+
+# create new data frame called trust_bysex
+trust_bysex <- world_values %>%
+  select(sex, conf_churches) %>% #select only needed variables
+  filter(!is.na(sex)) %>% #remove NAs
+  group_by(sex) %>% #group by sex
+  summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean
+
+
+trust_bysex #take a look at the final DF
+```
+
+Great! So now we have a new data frame called `trust_bysex` which has the mean value of confidence in churches for both men and women. Since we are interested in a discrete variable (sex) and two average values of confidence, our best bet here is a bar graph. But how do we do that? With the `ggplot` function!
+
+The `ggplot()` function begins as such:
+
+```{r, eval = FALSE}
+
+ggplot(data, aes(x = ___, y = ___)
+
+```
+
+Our first necessary argument is `data`. This is where we tell R what data we want ggplot to plot! Second, we have `aes` which stands for "aesthetics". This is where we tell R what we want to go on the x versus y axes. So, with that in mind, we would proceed as follows:
+
+```{r, eval = FALSE}
+
+ggplot(trust_bysex, aes(x = sex, y = mean_trust))
+
+```
+
+Above we told `ggplot` that our data is saved as `trust_bysex` and on the x axis we will be plotting `sex` while on the y axis we will be plotting `mean_trust`.
+
+```{r}
+
+ggplot(trust_bysex, aes(x = sex, y = mean_trust)) +
+  geom_col()
+
+```
+
+
+
