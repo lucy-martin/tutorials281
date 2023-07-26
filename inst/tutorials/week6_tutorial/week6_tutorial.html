@@ -115,7 +115,7 @@ if (window.hljs) {
 learn how to examine data via graphs and figures. There are many ways to
 visualize data, and this often depends on the variables we are
 interested in. In particular, it is important to consider if the data we
-are plotting is discrete (aka categorical) or continous.</p>
+are plotting is discrete (aka categorical) or continuous.</p>
 <p>The main package we will use to visualize data is called
 <code>ggplot2</code>, which is part of the tidyverse. Our skills in
 using <code>dplyr</code> and the <code>tidyverse</code> will come in
@@ -234,9 +234,9 @@ evangelical Protestant.</p>
 class="section level3">
 <h3>Choosing the appropriate type of graph</h3>
 <p>Now that we have a few types of graphs under our belts, it is
-importan to understand how we decide which type of data visualization to
-use. The following will help you to make this decision as you visualize
-your own data:</p>
+important to understand how we decide which type of data visualization
+to use. The following will help you to make this decision as you
+visualize your own data:</p>
 <ul>
 <li>What type of data am I plotting? Are the variables discrete or
 continuous?</li>
@@ -252,16 +252,18 @@ But before we jump in there, it is essential to note that very little
 data is ready to be plotted from the get go. Often, we will need to
 summarize our data first using <code>dplyr</code> before we plot. Never
 forget this!</p>
-<div id="section-plotting-confidence-in-churches-by-respondent-sex"
+<div
+id="section-plotting-confidence-in-churches-by-respondent-citizenship-status"
 class="section level3">
-<h3>Plotting confidence in churches by respondent sex</h3>
+<h3>Plotting confidence in churches by respondent citizenship
+status</h3>
 <p>We’re going to illustrate how to use <code>ggplot2</code> with an
 example. Today, we’ll be using the World Values Survey, which here is
 saved as <code>world_values</code>. We have close to 95000 observations
 of individuals across the world about their opinions regarding
 government, trust in institutions, and their values. Let’s say we are
-interested in examining how confidence in churches by the sex of
-respondents.</p>
+interested in examining how confidence in churches by the citizenship
+status of respondents.</p>
 <p>First, let’s take a look at our data:</p>
 <pre class="r"><code>summary(world_values)</code></pre>
 <pre><code>##  conf_churches   conf_armforces   conf_police      conf_govt    
@@ -281,13 +283,18 @@ respondents.</p>
 ##  Max.   :2.000   Max.   :103.00   Max.   :2.000   (Other):    0  
 ##  NA&#39;s   :95      NA&#39;s   :510      NA&#39;s   :5201    NA&#39;s   : 5440</code></pre>
 <p>Okay, looks like we have a few different variables here which capture
-confidence, in addition to respondent sex, age, whether or not they are
-a citizen, and their socioeconomic class. First, let’s recode
-<code>sex</code> so that it is easier to understand. According to the
-survey, 1 is Male and 2 is Female. In this case, we do not have a
-variable which captures gender identification, unfortunately.</p>
-<pre class="r"><code>world_values$sex &lt;- ifelse(world_values$sex == 1, &quot;Male&quot;,
-                           ifelse(world_values$sex == 2, &quot;Female&quot;, NA))</code></pre>
+confidence, in addition to respondent citizenship status, we also have
+sex, age, and their socioeconomic class. First, let’s re-code
+<code>citizen</code> so that it is easier to understand. According to
+the codebook, the survey asked respondents: Are you a citizen of this
+country?. The value <code>1</code> corresponds to “yes I am a citizen of
+this country” while <code>2</code> corresponds to “no, I am not a
+citizen of this country.”</p>
+<p>Below, we recode this variable to have more informative information
+using the <code>ifelse()</code> command.</p>
+<pre class="r"><code>world_values$citizen &lt;- ifelse(world_values$citizen == 1, &quot;Citizen&quot;,
+                           ifelse(world_values$citizen == 2, &quot;Non-Citizen&quot;,
+                                  NA))</code></pre>
 <p>Great. The codebook also tells us that for all confidence questions,
 higher values (in this case, a maximum of 4) corresponds to higher
 confidence, while lower values correspond to lower confidence.</p>
@@ -296,26 +303,26 @@ variables? Well, first we should probably consider that we need to
 calculate an <em>average level of trust</em> in churches for each sex.
 We can do so easily using dplyr:</p>
 <pre class="r"><code># create new data frame called trust_bysex
-trust_bysex &lt;- world_values %&gt;%
-  select(sex, conf_churches) %&gt;% #select only needed variables
-  filter(!is.na(sex)) %&gt;% #remove NAs
-  group_by(sex) %&gt;% #group by sex
+trust_bycitizen &lt;- world_values %&gt;%
+  select(citizen, conf_churches) %&gt;% #select only needed variables
+  filter(!is.na(citizen)) %&gt;% #remove NAs
+  group_by(citizen) %&gt;% #group by sex
   summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean trust for each group
 
 
 
-trust_bysex #take a look at the final DF</code></pre>
+trust_bycitizen #take a look at the final DF</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["sex"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean_trust"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Female","2":"2.181736"},{"1":"Male","2":"2.249128"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["citizen"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean_trust"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Citizen","2":"2.163787"},{"1":"Non-Citizen","2":"2.605383"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Great! So now we have a new data frame called
-<code>trust_bysex</code> which has the mean value of confidence in
-churches for both men and women. Since we are interested in a discrete
-variable (sex) and two average values of confidence, our best bet here
-is a bar graph. But how do we do that? With the <code>ggplot</code>
-function!</p>
+<code>trust_bycitizen</code> which has the mean value of confidence in
+churches for both citizens and non-citizens. Since we are interested in
+a discrete variable (citizenship) and two average values of confidence,
+our best bet here is a bar graph. But how do we do that? With the
+<code>ggplot</code> function!</p>
 <p>The <code>ggplot()</code> function begins as such:</p>
 <pre class="r"><code>ggplot(data, aes(x = ___, y = ___)</code></pre>
 <p>Our first necessary argument is <code>data</code>. This is where we
@@ -323,16 +330,16 @@ tell R what data we want ggplot to plot! Second, we have
 <code>aes</code> which stands for “aesthetics”. This is where we tell R
 what we want to go on the X and Y axes. So, with that in mind, we would
 proceed as follows:</p>
-<pre class="r"><code>ggplot(trust_bysex, aes(x = sex, y = mean_trust))</code></pre>
+<pre class="r"><code>ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust))</code></pre>
 <p>Above we told <code>ggplot</code> that our data is saved as
-<code>trust_bysex</code> and on the x axis we will be plotting
-<code>sex</code> while on the y axis we will be plotting
+<code>trust_bycitizen</code> and on the x axis we will be plotting
+<code>citizen</code> while on the y axis we will be plotting
 <code>mean_trust</code>.</p>
 <p>But, we’re not done! We have not yet specified what <em>type</em> of
 graph we want. To specify that we want a bar graph, we will use the
 command <code>geom_col()</code>. We will add it on to our first line of
 code with a <code>+</code></p>
-<pre class="r"><code>ggplot(trust_bysex, aes(x = sex, y = mean_trust)) +
+<pre class="r"><code>ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust)) +
   geom_col()</code></pre>
 <p><img src="week6_tutorial_files/figure-html/unnamed-chunk-8-1.png" width="624" /></p>
 <p>And look at that! We have a graph. Notice that men tend to have
@@ -716,7 +723,7 @@ ggplot(citizen_govt2, aes(x = class, y = mean_trust, fill = citizen)) +
 </div>
 <p>Once you have completed these tasks, please complete <a
 href="https://unc.az1.qualtrics.com/jfe/form/SV_8wfkiUYbmaEiKfY">this
-comprehension quiz.</a></p>
+comprehension quiz.</a>.</p>
 <p>
 <script type="application/shiny-prerendered" data-context="server-start">
 library(learnr)

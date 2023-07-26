@@ -1,5 +1,5 @@
 ---
-title: "Tutorial for Week "
+title: "Tutorial for Week 6"
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
@@ -45,7 +45,7 @@ trust_byage <- world_values %>%
 
 ## Welcome to Data Visualization!
 
-This week, we will learn how to visualize our data. That is, we will learn how to examine data via graphs and figures. There are many ways to visualize data, and this often depends on the variables we are interested in. In particular, it is important to consider if the data we are plotting is discrete (aka categorical) or continous.
+This week, we will learn how to visualize our data. That is, we will learn how to examine data via graphs and figures. There are many ways to visualize data, and this often depends on the variables we are interested in. In particular, it is important to consider if the data we are plotting is discrete (aka categorical) or continuous.
 
 The main package we will use to visualize data is called `ggplot2`, which is part of the tidyverse. Our skills in using `dplyr` and the `tidyverse` will come in handy here, as we often need to manipulate and summarize our data before visualizing it.
 
@@ -118,7 +118,7 @@ While there are many more types of ways to visualize data, we will conclude this
 
 ### Choosing the appropriate type of graph
 
-Now that we have a few types of graphs under our belts, it is importan to understand how we decide which type of data visualization to use. The following will help you to make this decision as you visualize your own data:
+Now that we have a few types of graphs under our belts, it is important to understand how we decide which type of data visualization to use. The following will help you to make this decision as you visualize your own data:
 
 - What type of data am I plotting? Are the variables discrete or continuous?
 - What relationship am I trying to show?
@@ -132,9 +132,9 @@ Now that we have a few types of graphs under our belts, it is importan to unders
 
 To plot data in R, we will be using the `ggplot2` package. But before we jump in there, it is essential to note that very little data is ready to be plotted from the get go. Often, we will need to summarize our data first using `dplyr` before we plot. Never forget this! 
 
-### Plotting confidence in churches by respondent sex
+### Plotting confidence in churches by respondent citizenship status
 
-We're going to illustrate how to use `ggplot2` with an example. Today, we'll be using the World Values Survey, which here is saved as `world_values`. We have close to 95000 observations of individuals across the world about their opinions regarding government, trust in institutions, and their values. Let's say we are interested in examining how confidence in churches by the sex of respondents.
+We're going to illustrate how to use `ggplot2` with an example. Today, we'll be using the World Values Survey, which here is saved as `world_values`. We have close to 95000 observations of individuals across the world about their opinions regarding government, trust in institutions, and their values. Let's say we are interested in examining how confidence in churches by the citizenship status of respondents.
 
 First, let's take a look at our data:
 
@@ -144,13 +144,15 @@ summary(world_values)
 
 ```
 
-Okay, looks like we have a few different variables here which capture confidence, in addition to respondent sex, age, whether or not they are a citizen, and their socioeconomic class. First, let's recode `sex` so that it is easier to understand. According to the survey, 1 is Male and 2 is Female. In this case, we do not have a variable which captures gender identification, unfortunately. 
+Okay, looks like we have a few different variables here which capture confidence, in addition to respondent citizenship status, we also have sex, age, and their socioeconomic class. First, let's re-code `citizen` so that it is easier to understand. According to the codebook, the survey asked respondents: Are you a citizen of this country?. The value `1` corresponds to "yes I am a citizen of this country" while `2` corresponds to "no, I am not a citizen of this country."
 
+Below, we recode this variable to have more informative information using the `ifelse()` command.
 
 ```{r}
 
-world_values$sex <- ifelse(world_values$sex == 1, "Male",
-                           ifelse(world_values$sex == 2, "Female", NA))
+world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
+                           ifelse(world_values$citizen == 2, "Non-Citizen",
+                                  NA))
 
 ```
 
@@ -162,18 +164,18 @@ What would be the best way to plot the relationship between these variables? Wel
 ```{r}
 
 # create new data frame called trust_bysex
-trust_bysex <- world_values %>%
-  select(sex, conf_churches) %>% #select only needed variables
-  filter(!is.na(sex)) %>% #remove NAs
-  group_by(sex) %>% #group by sex
+trust_bycitizen <- world_values %>%
+  select(citizen, conf_churches) %>% #select only needed variables
+  filter(!is.na(citizen)) %>% #remove NAs
+  group_by(citizen) %>% #group by sex
   summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean trust for each group
 
 
 
-trust_bysex #take a look at the final DF
+trust_bycitizen #take a look at the final DF
 ```
 
-Great! So now we have a new data frame called `trust_bysex` which has the mean value of confidence in churches for both men and women. Since we are interested in a discrete variable (sex) and two average values of confidence, our best bet here is a bar graph. But how do we do that? With the `ggplot` function!
+Great! So now we have a new data frame called `trust_bycitizen` which has the mean value of confidence in churches for both citizens and non-citizens. Since we are interested in a discrete variable (citizenship) and two average values of confidence, our best bet here is a bar graph. But how do we do that? With the `ggplot` function!
 
 The `ggplot()` function begins as such:
 
@@ -187,22 +189,22 @@ Our first necessary argument is `data`. This is where we tell R what data we wan
 
 ```{r, eval = FALSE}
 
-ggplot(trust_bysex, aes(x = sex, y = mean_trust))
+ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust))
 
 ```
 
-Above we told `ggplot` that our data is saved as `trust_bysex` and on the x axis we will be plotting `sex` while on the y axis we will be plotting `mean_trust`. 
+Above we told `ggplot` that our data is saved as `trust_bycitizen` and on the x axis we will be plotting `citizen` while on the y axis we will be plotting `mean_trust`. 
 
 But, we're not done! We have not yet specified what *type* of graph we want. To specify that we want a bar graph, we will use the command `geom_col()`. We will add it on to our first line of code with a `+`
 
 ```{r}
 
-ggplot(trust_bysex, aes(x = sex, y = mean_trust)) +
+ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust)) +
   geom_col()
 
 ```
 
-And look at that! We have a graph. Notice that men tend to have higher trust in churches, but there is not much of a difference.
+And look at that! We have a graph. Notice that non-citizens tend to have higher trust in churches.
 
 Further, there are many different types of graphs that ggplot can handle, all with their own specific command. You are not expected to memorize them. Rather, we suggest that you always take a look at [this handy cheat sheet developed by Posit](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf).
 

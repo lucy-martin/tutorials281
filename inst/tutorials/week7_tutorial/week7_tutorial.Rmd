@@ -1,0 +1,143 @@
+---
+title: "Tutorial for Week 7"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(knitr)
+#library(tidyverse)
+library(dplyr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+
+
+# set up data for world values survey
+
+world_values <- read.csv("wave_7_wvs.csv") %>%
+  select(Q292G, Q66, Q275, H_URBRURAL, Q76) %>% 
+  rename(pol_honest = Q292G,
+         conf_press = Q66, 
+         edu = Q275,
+         urban_rual = H_URBRURAL,
+         conf_election = Q76
+         )
+
+world_values[world_values == -5] <- NA
+world_values[world_values == -4] <- NA
+world_values[world_values == -2] <- NA
+world_values[world_values == -1] <- NA
+
+
+```
+
+## Data Visualization Part 2
+
+Last week, we learned how to visualize data using `ggplot2`. Importantly, we also learned that in order to properly visualize data, it is necessary to first summarize that data using `dplyr`. In this tutorial, we will discuss necessary steps you need to take to set yourself up for good data visualizations. We will then practice creating a visualization using data from the World Values Survey.
+
+## Steps to Good Visualizations
+
+In order to create a good data visualization -- regardless of whether that is a bar graph, a scatterplot, or whatever you wish! -- it is important to be organized and intentional in how you approach its creation. Here, we're going to break down data visualization into six straightforward steps which will set you up to successfully illustrate relationships of interest with data!
+
+To help with this, we will walk through an example data visualization as well. In the following section, you will then practice on your own.
+
+### 1) Decide what relationship you want to illustrate
+
+Before anything, you need to know what you want to visualize. What is the relationship of interest? What question are you hoping to answer?
+
+In this case, we are going to use data from the World Values Survey. We are using this data because we are specifically interested in answering the following question: Do individuals who live in urban vs. rural areas have different levels of trust in the police?
+
+### 2) Determine what variables are necessary for you to illustrate that relationship
+
+Now that we have our question figured out, we need to determine which variables we can use to answer the question. In this case, we have already determined the appropriate data set -- The World Values Survey -- because we know that it has variables which will allow us to answer this question. Normally, identifying a data set is a crucial element as well. 
+
+Let's check out the data `world_values`.
+
+```{r}
+
+summary(world_values)
+
+```
+
+Within the data set, we can see that there are two variables which should be of use to us. `urban_rural` is a variable which captures whether or not an individual lives in an urban vs. rural area. `conf_election` is a variable which captures respondents' levels of trust in elections. These variables are coded as follows:
+
+* `urban_rural`: 1 == Urban, 2 == Rural
+* `conf_election`: A scale from 1-4, where 1 == a great deal and 4 == none at all
+
+![alt text here](week7_tutorial/graph_sketch.jpeg)
+
+### 3) Sketch out (yes, with pen and paper!) what you want the visualization to look like
+
+### 4) Determin how you need to summarize or transform your raw data to make that sketch come to life
+
+### 5) Conduct those summaries or transformations
+
+### 6) Visualize!
+
+
+
+
+## Various ways to visualize these variables
+
+```{r}
+
+world_values$conf_press <- ifelse(world_values$conf_press == 4, 1,
+                           ifelse(world_values$conf_press == 3, 2,
+                           ifelse(world_values$conf_press == 2, 3,
+                           ifelse(world_values$conf_press == 1, 4, NA))))
+
+
+world_values$ed_cat <- ifelse(world_values$edu <= 3, "High School and Below",
+                              ifelse(world_values$edu > 3, "Post-Secondary and Above",
+                                     NA))
+
+world_values$honest_cat <- ifelse(world_values$pol_honest <= 3, "Low",
+                              ifelse(world_values$pol_honest > 3, "High",
+                                     NA))
+
+world_values %>%
+  na.omit() %>%
+group_by(pol_honest, ed_cat) %>%
+summarize(mean_conf = mean(conf_press, na.rm = T)) %>%
+  ggplot(aes(x = pol_honest, y = mean_conf)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ed_cat)
+
+world_values %>%
+  na.omit() %>%
+group_by(pol_honest, ed_cat) %>%
+summarize(mean_conf = mean(conf_press, na.rm = T)) %>%
+  ggplot(aes(x = pol_honest, y = mean_conf, color = ed_cat)) +
+  geom_point() +
+  geom_line() + 
+  theme_bw() +
+  labs(x = "Politicians Are Honest (1-5)", # x axis label
+       y = "Avg. Confidence in Press (1-4 scale)", # y axis label
+       title = "Perception of Politician Honesty vs. Confidence in Press",
+       color = "Education") 
+
+
+world_values %>%
+  na.omit() %>%
+group_by(honest_cat, ed_cat) %>%
+summarize(mean_conf = mean(conf_press, na.rm = T)) %>%
+  ggplot(aes(x = honest_cat, y = mean_conf, fill = ed_cat)) +
+  geom_col(position = "dodge") +
+  theme_bw()
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+
