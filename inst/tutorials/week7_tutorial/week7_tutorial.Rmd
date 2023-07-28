@@ -20,7 +20,7 @@ world_values <- read.csv("wave_7_wvs.csv") %>%
   rename(pol_honest = Q292G,
          conf_press = Q66, 
          edu = Q275,
-         urban_rual = H_URBRURAL,
+         urban_rural = H_URBRURAL,
          conf_election = Q76
          )
 
@@ -29,28 +29,39 @@ world_values[world_values == -4] <- NA
 world_values[world_values == -2] <- NA
 world_values[world_values == -1] <- NA
 
+world_values$conf_elec <- ifelse(world_values$conf_elec == 4, 1,
+                           ifelse(world_values$conf_elec == 3, 2,
+                           ifelse(world_values$conf_elec == 2, 3,
+                           ifelse(world_values$conf_elec == 1, 4, NA))))
+
+
+world_values$conf_press <- ifelse(world_values$conf_press == 4, 1,
+                           ifelse(world_values$conf_press == 3, 2,
+                           ifelse(world_values$conf_press == 2, 3,
+                           ifelse(world_values$conf_press == 1, 4, NA))))
+
 
 ```
 
 ## Data Visualization Part 2
 
-Last week, we learned how to visualize data using `ggplot2`. Importantly, we also learned that in order to properly visualize data, it is necessary to first summarize that data using `dplyr`. In this tutorial, we will discuss necessary steps you need to take to set yourself up for good data visualizations. We will then practice creating a visualization using data from the World Values Survey.
+Last week, we learned how to visualize data using `ggplot2`. Importantly, we also learned that in order to properly visualize data, it is often necessary to first summarize that data using `dplyr`. In this tutorial, we will discuss necessary steps to set yourself up to create good data visualizations. We will then practice creating a visualization using data from the World Values Survey.
 
 ## Steps to Good Visualizations
 
-In order to create a good data visualization -- regardless of whether that is a bar graph, a scatterplot, or whatever you wish! -- it is important to be organized and intentional in how you approach its creation. Here, we're going to break down data visualization into six straightforward steps which will set you up to successfully illustrate relationships of interest with data!
+In order to create a good data visualization -- regardless of whether that is a bar graph, a scatterplot, or whatever you wish! -- it is important to be organized and intentional in how you approach its creation. Here, we're going to break down data visualization into six straightforward steps which will set you up to successfully illustrate relationships of interest.
 
-To help with this, we will walk through an example data visualization as well. In the following section, you will then practice on your own.
+To help with this, we will walk through an example. In the following section, you will then practice on your own.
 
 ### 1) Decide what relationship you want to illustrate
 
 Before anything, you need to know what you want to visualize. What is the relationship of interest? What question are you hoping to answer?
 
-In this case, we are going to use data from the World Values Survey. We are using this data because we are specifically interested in answering the following question: Do individuals who live in urban vs. rural areas have different levels of trust in the police?
+For this example, we are interested in answering the following question: *Do people who live in urban vs. rural areas have different levels of trust in the police?*
 
 ### 2) Determine what variables are necessary for you to illustrate that relationship
 
-Now that we have our question figured out, we need to determine which variables we can use to answer the question. In this case, we have already determined the appropriate data set -- The World Values Survey -- because we know that it has variables which will allow us to answer this question. Normally, identifying a data set is a crucial element as well. 
+Now that we have our question figured out, we need to determine what data and which variables we can use to answer the question. In this case, we are going to use data from the World Values Survey. We decide to use this data because we know that it has variables which will allow us to answer our key question. 
 
 Let's check out the data `world_values`.
 
@@ -63,78 +74,195 @@ summary(world_values)
 Within the data set, we can see that there are two variables which should be of use to us. `urban_rural` is a variable which captures whether or not an individual lives in an urban vs. rural area. `conf_election` is a variable which captures respondents' levels of trust in elections. These variables are coded as follows:
 
 * `urban_rural`: 1 == Urban, 2 == Rural
-* `conf_election`: A scale from 1-4, where 1 == a great deal and 4 == none at all
-
-![alt text here](week7_tutorial/graph_sketch.jpeg)
+* `conf_election`: A scale from 1-4, where 1 == none at all and 4 == a great deal
 
 ### 3) Sketch out (yes, with pen and paper!) what you want the visualization to look like
 
-### 4) Determin how you need to summarize or transform your raw data to make that sketch come to life
+Now that we know what variables we have, it is useful to *literally* sketch out what we are interested in visualizing. In this case, since we have one categorical variable (`urban_rural`) and one continuous variable (`conf_election`) we'll go with a bar graph. We create a little mock sketch (see below) and how we might want this to look.
 
-### 5) Conduct those summaries or transformations
+<iframe src="https://drive.google.com/file/d/1Gwoo5gxM61UNV1y5SDDM_v76T-ttm6A0/preview" width="480" height="450" allow="autoplay"></iframe>
 
-### 6) Visualize!
+Notice that we have two categories on our x-axis (for urban and rural) and the y-axis corresponds to one value of trust for each group. This provides us useful information for our next step!
+
+### 4) Determine how you need to summarize or transform your raw data to make that sketch come to life
+
+Currently, our data is in its raw format. Prior to creating a visual, we need to perform the appropriate transformations or summaries of the data to allow us to create a graph.
+
+**First**, let's consider our `urban_rural` variable. It's current values are not particularly straightforward to follow. Let's recode that variable so its values are more informative. We will recode values of `1` to be "Urban", values of `2` to be "Rural" and leave any other values as `NA`.
+
+**Second,** we can now think about what we should do with the `conf_election` variable. At this point, we currently have about 95,000 respondents who each have reported a different level of trust in elections. But, are we really interested in each of those *individual* responses, or are we interested in an aggregate level?
+
+Let's reflect on our question of interest: *Do people who live in urban vs. rural areas have different levels of trust in the police?* Now, although we are intereted in *people*, this question indicates to us that we are interested in comparing *two groups* of people. In that case, our best approach here would be to determine what is the *average level of trust in the police* across these two groups. 
+
+### 5) Conduct necessary data summaries or transformations
+
+First, let's handle the `urban_rural` variable which we discussed above.
+```{r}
+
+#use ifelse() to recode urban_rural
+world_values$urban_rural <- ifelse(world_values$urban_rural == 1, "Urban",
+                                   ifelse(world_values$urban_rural == 2, "Rural",
+                                          NA))
 
 
+```
 
-
-## Various ways to visualize these variables
+Second, we can now summarize our data across the two groups of interest (urban vs. rural residents). We can easily summarize our data using `dplyr`, as we learned last week. In the below code, I use `dplyr` to create a new data set, which I title `plot_data1`. I summarize the `world_values` data to calculate the mean level of confidence in elections for respondents who live in urban vs. rural areas. 
 
 ```{r}
 
-world_values$conf_press <- ifelse(world_values$conf_press == 4, 1,
-                           ifelse(world_values$conf_press == 3, 2,
-                           ifelse(world_values$conf_press == 2, 3,
-                           ifelse(world_values$conf_press == 1, 4, NA))))
+plot_data1 <- world_values %>%
+  na.omit() %>%
+  select(urban_rural, conf_election) %>%
+  group_by(urban_rural) %>%
+  summarize(mean_conf = mean(conf_election, na.rm = T))
+
+plot_data1
+
+```
 
 
+### 6) Visualize!
+
+Now, we can plot! We will do so using the `ggplot()` command. Above, we decided that a bar graph was the best way to visualize this data. To create a bar graph, we will use the `geom_col()` argument. 
+
+```{r}
+
+ggplot(plot_data1, aes(x = urban_rural, y = mean_conf)) +
+  geom_col()
+
+```
+
+A great start, but pretty basic! Let's customize this a bit with more informative axes labels, a title, and a more appealing color scheme.
+
+```{r}
+
+ggplot(plot_data1, aes(x = urban_rural, y = mean_conf)) +
+  geom_col(fill = "skyblue2") +
+  labs(x = "Urban vs. Rural Residency",
+       y = "Mean Confidence in Elections (1-4 scale)",
+       title = "Urban/Rural Residency and Confidence in Elections") +
+  theme_bw()
+
+```
+
+Now, it is your turn. In the next section, you will apply these six steps to creating your own data visualization from beginning to end. 
+
+## Practicing Data Visualization
+
+Your task is to create a data visualization to answer the following question: *Do those who believe politicians are honest have higher or lower trust in the press? And does this relationship differ by education level?*
+
+Your key variables of interest are as follows:
+
+* `conf_press`: respondent confidence in the press (1-4 scale, 1 = none at all, 4 = a great deal)
+* `pol_honest`: respondent's response to the question "Most politicians are honest and truthful, do you agree or disagree?" (1-5 scale, 5 = agree strongly, 1 = disagree strongly)
+* `edu`: respondent's level of education, where:
+     + 0.- Early childhood education/no education 
+     + 1.- Primary education
+     + 2.- Lower secondary education
+     + 3.- Upper secondary education
+     + 4.- Post-secondary non-tertiary education
+     + 5.- Short-cycle tertiary education
+     + 6.- Bachelor or equivalent
+     + 7.- Master or equivalent
+     + 8.- Doctoral or equivalent
+
+Before beginning, we'll start off by summarizing the data again so you can get a look at it:
+
+```{r}
+summary(world_values)
+```
+
+There is no singular correct way to visualize this data. On the next slide, you can check out a few possible ways to do so. And do not forget the six steps!
+
+1) Decide what relationship you want to illustrate
+2) Determine what variables are necessary for you to illustrate that relationship
+3) Sketch out what you want the visualization to look like
+4) Determine how you need to summarize or transform your raw data to make that sketch come to life
+5) Conduct necessary data summaries or transformations
+6) Visualize!
+
+```{r practice, exercise = TRUE, exercise.lines = 20}
+
+
+```
+
+
+## Practicing Data Visualization: Key
+
+For the following visualizations, we transformed the `edu` variable to be categorical.
+
+```{r}
+
+#transformation edu to be ed_cat using ifelse()
 world_values$ed_cat <- ifelse(world_values$edu <= 3, "High School and Below",
                               ifelse(world_values$edu > 3, "Post-Secondary and Above",
                                      NA))
+```
 
-world_values$honest_cat <- ifelse(world_values$pol_honest <= 3, "Low",
-                              ifelse(world_values$pol_honest > 3, "High",
+
+### Option 1
+
+Here, we look at politician honesty on the x-axis, and confidence in the press on the y-axis. We calculate the average value for each of these, but do so based on respondent education. We then facet our plot so we have two separate panels for each education category.
+
+```{r}
+world_values %>%
+  na.omit() %>% # remove NA values
+group_by(pol_honest, ed_cat) %>% # group by for summarizing
+summarize(mean_conf = mean(conf_press)) %>% # calculate mean level of confidence
+  ggplot(aes(x = pol_honest, y = mean_conf)) + # begin plot with x and y axis 
+  geom_point() + #include dots
+  geom_line() + #include lines
+  facet_wrap(~ed_cat) + #facet our plot by education
+  theme_bw() + #black and white theme
+  labs(x = "Politicians Are Honest (1-5)", # x axis label
+       y = "Avg. Confidence in Press (1-4 scale)", # y axis label
+       title = "Perception of Politician Honesty vs. Confidence in Press") # title
+
+```
+
+### Option 2
+
+This visualization is similar to Option 1, but instead of faceting, we create two different colored lines for our education categories.
+```{r}
+
+world_values %>%
+  na.omit() %>% # remove NA values
+group_by(pol_honest, ed_cat) %>% # group by for summarizing
+summarize(mean_conf = mean(conf_press)) %>% # calculate mean level of confidence
+  ggplot(aes(x = pol_honest, y = mean_conf, color = ed_cat)) + # begin plot with
+  # x and y axis, also specify color for education
+  geom_point() + #include dots
+  geom_line() + #include line
+  theme_bw() + # black and white theme
+  labs(x = "Politicians Are Honest (1-5)", # x axis label
+       y = "Avg. Confidence in Press (1-4 scale)", # y axis label
+       title = "Perception of Politician Honesty vs. Confidence in Press", #title
+       color = "Education") #legend title
+```
+
+### Option 3
+
+For this option, we decided to also make our `pol_honest` variable categorical. Since one of our main variables is now categorical, we went with a bar graph! We calculated the average confidence in the press by education level, with different colored bars for each category of education. 
+
+```{r}
+#transformation pol_honest to be honest_cat using ifelse()
+world_values$honest_cat <- ifelse(world_values$pol_honest <= 3, "Disagree",
+                              ifelse(world_values$pol_honest > 3, "Agree",
                                      NA))
 
 world_values %>%
-  na.omit() %>%
-group_by(pol_honest, ed_cat) %>%
-summarize(mean_conf = mean(conf_press, na.rm = T)) %>%
-  ggplot(aes(x = pol_honest, y = mean_conf)) +
-  geom_point() +
-  geom_line() +
-  facet_wrap(~ed_cat)
-
-world_values %>%
-  na.omit() %>%
-group_by(pol_honest, ed_cat) %>%
-summarize(mean_conf = mean(conf_press, na.rm = T)) %>%
-  ggplot(aes(x = pol_honest, y = mean_conf, color = ed_cat)) +
-  geom_point() +
-  geom_line() + 
-  theme_bw() +
-  labs(x = "Politicians Are Honest (1-5)", # x axis label
+  na.omit() %>% #remove NAs
+group_by(honest_cat, ed_cat) %>% #group by for summarizing
+summarize(mean_conf = mean(conf_press)) %>% #calculate mean confidence
+  ggplot(aes(x = honest_cat, y = mean_conf, fill = ed_cat)) + # specify our
+  # x and y axes, and also that we will have different fill colors by edu
+  geom_col(position = "dodge") + #bar graph, with "dodged" bars (side by side)
+  theme_bw() +  # black and white theme
+  labs(x = "Politicians Are Honest?", # x axis label
        y = "Avg. Confidence in Press (1-4 scale)", # y axis label
-       title = "Perception of Politician Honesty vs. Confidence in Press",
-       color = "Education") 
-
-
-world_values %>%
-  na.omit() %>%
-group_by(honest_cat, ed_cat) %>%
-summarize(mean_conf = mean(conf_press, na.rm = T)) %>%
-  ggplot(aes(x = honest_cat, y = mean_conf, fill = ed_cat)) +
-  geom_col(position = "dodge") +
-  theme_bw()
-
-
-
-
-
-
-
-
-
+       title = "Perception of Politician Honesty vs. Confidence in Press", #title
+       fill = "Education") #legend title
 
 
 ```
