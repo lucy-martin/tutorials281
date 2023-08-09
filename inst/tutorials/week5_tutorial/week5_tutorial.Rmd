@@ -49,14 +49,13 @@ Some of the most useful commands from the dplyr package can be seen in the below
 ```{r, echo = F, results = 'asis'}
 
 table <- data.frame(Command = c("select()", "filter()", "group_by()",
-                                "summarise()", "mutate()", "arrange()",
-                                "rename()"),
+                                "summarise()", "mutate()", "arrange()"),
                     Description = c("Selects columns (variables)",
                                     "Filters (subsets) rows",
                                     "Groups the data",
                                     "Summarises (or aggregates) data",
                                     "Creates new variables", 
-                                    "Sorts the data", "Renames a variable"))
+                                    "Sorts the data"))
 
 
 kable(table, caption = "Important dplyr Commands")
@@ -298,6 +297,10 @@ women_service
 
 ```
 
+## Topic 3: Less Common `dplyr` commands
+
+
+
 ## Comprehension Quiz
 
 Prior to taking the below quiz, please solve the following problem. You will then report your answer in the quiz.
@@ -322,3 +325,5 @@ junior_members # Dem = 0.67, Rep = 2.00
 ```
 
 [Report your answer via this quiz](https://unc.az1.qualtrics.com/jfe/form/SV_b2vD9CBylRYI2WO)
+
+
