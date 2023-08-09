@@ -412,7 +412,14 @@ sum_protest # return the result
 
 ```
 
+`R` also has several built-in functions that allow us to perform mathematical operations on vectors. Two of them will be especially helpful as you move forward. The first function, mean(), calculates the arithmetic mean of a vector. The second function, sum(), calculates the sum of a vector. To see how these functions work, let's compute the mean and the sum of our `protest_15` vector.
 
+```{r protest_add3, exercise = TRUE, exercise.setup = "protest"}
+
+mean(protest_15) # calculate the mean
+
+sum(protest_15) # calculat the sum 
+```
 
 ### Practice
 
