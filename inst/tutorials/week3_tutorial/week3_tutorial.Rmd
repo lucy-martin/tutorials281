@@ -17,7 +17,7 @@ data(mtcars)
 
 ## Welcome
 
-In this tutorial, you will become acquainted with two-dimensional R objects. We will be learning about two types, called **matrices** (singular: matrix) and **data frames**. Primarily, we will be working with data frames as they are more flexible. 
+In this tutorial, you will learn about two topics. First, you will learn how computers store files. This will give you a foundation for understanding how to import data into R. Second, we will learn about two-dimensional R objects. We will learn about two types, called **matrices** (singular: matrix) and **data frames**. We will primarily work with data frames, as they are more flexible. 
 
 These types of data are 2D because they have both rows *and* column, while before we were working with just one-dimensional data which could be described as only a row *or* a column. For example, say we have some data about cars. A one-dimensional object may have looked just like a list of the names of the cars, like this:
 
@@ -35,9 +35,31 @@ But now with two-dimensional data, it will take on a more complex format. For ex
 head(mtcars[1:5, 1:5])
 ```
 
+## Topic 1: How Computers Store Files
 
+To fully harness the power of R for data analysis and manipulation, it's important to understand how computers store files and how R interacts with them. Armed with this knowledge, you will be able to seamlessly load data sets, analyze them, and save the results! 
 
-## Topic 1: Data Frames
+### The Basics
+
+Let's start with the basics. Your computer's storage system is organized into *folders*, which can contain additional folders and *files*. These files consist of collections of data, such as text, pictures, videos, and more. Each file has a unique location on your hard drive, which we can access using something called a *path*. A file path is the address that specifies the location of a file on your computer's storage system. It's like giving directions to R on where to find the data you want to work with! 
+
+Suppose we have the file data.csv located in a folder called "Documents." Let's look at how the file paths would appear on both Windows and macOS:
+
+- On Windows, the file path to data.csv would be `"C:/Users/Guest/Documents/data.csv"`.
+
+- On macOS, the file path to data.csv would be `"/Users/Guest/Documents/data.csv"`.
+
+### Checking Your Working Directory
+
+Finally, R has what's called a *working directory*. The working directory is the default location where R looks for files and saves outputs if no path is specified. You can check the current working directory in R using the `getwd()` function:
+
+```{r eval = F}
+getwd() #check the current working directory
+```
+
+Okay, before we move on to the next topic, take a moment to create a special folder to store all of your materials for this class. Having a dedicated POLI 281 folder will help keep your R scripts, data files, and any other class-related materials in one place, making them easier to manage and locate throughout the course!
+
+## Topic 2: Data Frames
 
 Data frames are a flexible, 2D form of data. They are able to handle multiple types of data in the same object, including numbers, text, and Boolean data types.
 
@@ -98,6 +120,62 @@ newspaper_data
 
 This will only work if each of those vectors has the same *number of elements*, which translates to the number of rows in the data frame.
 
+It is also possible to modify the data frame in other ways. Suppose you want to add a new column showing the year each newspaper was founded. We can do this using the `cbind()` command.
+
+```{r, eval = T}
+#create a vector corresponding to each newspaper's founding year
+founded <- c(1982, 1889, 1851, 1801)
+
+#use the cbind() command to add “Year_Founded” to the dataframe 
+newspaper_data <- cbind(newspaper_data, Year_Founded = founded)
+
+#return the data frame
+newspaper_data
+```
+
+We can use a related command called `rbind()` to add new rows to existing data frames. Suppose, for example, you go out and collect additional data for another newspaper, the Guardian. This is a British newspaper that has 111,155 subscribers, has its headquarters in London, and has been in business since 1821. Let’s add this information to our existing data frame.  
+
+```{r, eval = T}
+# create a new data frame for the Guardian
+new_row <- data.frame(
+  name = "The Guardian",
+  n_subscribe = 111155,
+  head_q = "London",
+  Year_Founded = 1821
+)
+
+# use rbind() to add the new row to our existing data frame
+newspaper_data <- rbind(newspaper_data, new_row)
+
+# return the data frame
+newspaper_data
+```
+
+We can also create new variables and add them to our existing data frame using the `$` sign.  Perhaps we want to add a variable corresponding to the country in which each newspaper is based. We can do this as follows.
+
+```{r, eval = T}
+#create a vector corresponding to the country in which each newspaper is based
+country <- c("USA", "USA", "USA", "USA", "UK")
+
+#use the $ sign to add this variable to our existing data frame 
+newspaper_data$country <- country
+
+#return the data frame 
+newspaper_data
+```
+
+In last week's lesson, we learned some basic arithmetic operations in R, such as `+` and `-`. We can use these operators to create new variables as well! Suppose we want to create a variable that indicates the age of each newspaper. To do this, we need to subtract the founding year (`Year_Founded`) from the current year (2023). We will combine the `-` operator and the `$` sign introduced above. 
+
+```{r, eval = T}
+#create the age variable using the $ sign and the subtraction operator
+newspaper_data$age <- 2023 - newspaper_data$Year_Founded
+
+#return the data frame
+newspaper_data
+```
+
+As you can see, the New York Post is the oldest newspaper in the data frame at a whopping 222 years, while USA Today is the youngest at 41 years!
+
 ### Summarizing the Data Frame
 
 Now, say you want to examine that new data frame without returning the whole thing. A useful command here would be the `summary()` command. This command returns information about each of the variables. In the case of the character variables, it will tell you what class they are (character vs. numeric, for example) and the length of that variable (how many rows). In the case of numeric variables, it will give you useful information such as the minimum value, the maximum, etc. See below!
@@ -128,13 +206,19 @@ There is a similar function for the number of columns -- or variables. This is `
 ncol(mtcars) #has 11 variables
 ```
 
-
-Finally, we can use `dim()` to ask R how many rows *and* columns a data frame has.
+We can use `dim()` to ask R how many rows *and* columns a data frame has.
 
 ```{r, eval = T}
 dim(mtcars) #32 rows, 11 columns
 ```
 
+Remember the `$` sign introduced above? We can use this to access specific columns in a data frame. Perhaps we want to look at the `mpg` column in the `mtcars` data.
+
+```{r, eval = T}
+mtcars$mpg
+```
+
+As you can see, using the `$` sign returns the values of the `mpg` variable!
 
 ### Practice
 
@@ -221,7 +305,7 @@ dim(large_cities)
 ```
 
 
-## Topic 2: Indexing Data Frames
+## Topic 3: Indexing Data Frames
 
 
 Just like with vectors, it can be useful with data frames to select certain element(s) of our data. Before with vectors, we only needed to indicate the name of the element or its place within the vector using `[]`. Now, with data frames, we have to be cognizant of both the element(s) place in terms of rows AND columns.
@@ -349,7 +433,7 @@ pres_fave[c(1, 3, 6), ]
 ```
 
 
-## Topic 3: Indexing Data Frames with Conditionals
+## Topic 4: Indexing Data Frames with Conditionals
 
 Another important skill for indexing data frames is using something called **conditional statements**. These are statements which evaluate if a certain *condition* is met, and returns data based on satisfying this condition. 
 
@@ -549,7 +633,7 @@ eu_info[eu_info$country == "Austria" | eu_info$country == "Bulgaria" |
 ```
 
 
-## Topic 4: Matrices
+## Topic 5: Matrices
 
 A **martix** is another 2D type of data, however matrices are not as flexible as data frames and we will not use them very often. However, they are still important to uerstand! Unlikes data frames, matrices can only handle data where every element is the same type (e.g., all numbers or all characters).
 

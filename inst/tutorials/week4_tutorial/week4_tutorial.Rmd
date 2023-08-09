@@ -120,8 +120,53 @@ war_data$war[war_data$war == "taiping rebellion"] <- "Taiping Rebellion"
 war_data$war
 ```
 
+## Topic 3: Factors
 
-## Topic 3: Summarizing with Missing Data
+Factors are a data type specifically designed for handling categorical data in R. Categorical variables are variables that represent data in different categories or levels. There are two main types of categorical variables: nominal and ordinal.
+
+1. ***Nominal*** variables have categories with no inherent order. Examples include party affiliation (e.g., Republican, Democrat, Independent) and gender (male or female).
+
+2. ***Ordinal*** variables have categories with a natural ranking or order. For example, language proficiency levels may be classified as Beginner, Intermediate, and Advanced.
+
+### Using the factor() Function
+
+In R, we use the `factor()` function to create factors. Let's see how it works using party affiliation as an example:
+
+```{r eval = T}
+party <- c("Republican", "Democrat", "Democrat", "Republican") #create a vector
+
+party.factor <- factor(party) # create a factor for party affiliation using factor()
+party.factor # inspect the resulting object
+```
+
+As you can see, `party.factor` has two levels: Democrat and Republican. We can also inspect the structure of R objects, including factors, using the `str()` function:
+
+```{r eval = T}
+str(party.factor) # inspect the structure of the factor
+```
+
+The output shows that R recognizes party.factor as a factor with two levels: Democrat (assigned a 2) and Republican (assigned a 1). Sometimes we may want to change the order of the levels in a factor. For example, let's make Republican the first level and Democrat the second:
+
+```{r eval = T}
+party.factor2 <- factor(party, levels = c("Republican", "Democrat")) # specify the levels
+str(party.factor2) # inspect output 
+```
+
+Great! Now `party.factor2` has Republican as the first level and Democrat as the second level. 
+
+### Ordered Factors
+
+As noted above, party affiliation is a nominal variable. When dealing with ordinal variables, we need to create ordered factors that reflect the natural order of the categories. Let's take the example of language proficiency levels:
+
+```{r eval = T}
+proficiency <- c("Advanced", "Beginner", "Intermediate", "Intermediate", "Advanced") #create a vector
+proficiency.factor <- factor(proficiency,ordered = TRUE, levels = c("Beginner", "Intermediate", "Advanced")) # create factor
+str(proficiency.factor) # inspect output
+```
+
+As you can see, R identifies `proficiency.factor` as an ordered factor with three levels: Beginner, Intermediate, and Advanced.
+
+## Topic 4: Summarizing with Missing Data
 
 Missing observations can affect how we summarize our data. Thankfully, many of the essential commands we use to summarize data -- like `mean()` -- take **arguments** which can help circumvent these issues. Some of these are **optional arguments**. Before diving into the specifics, and understanding how we can summarize our data even with missing values, we first need to learn about these **optional arguments**
 
@@ -248,7 +293,7 @@ Note that we can also do this with the `max()` function. Similar options are als
 
 
 
-## Topic 4: Creating a New Variable
+## Topic 5: Creating a New Variable
 
 In addition to recoding variables, we often want to create new variables in an existing data set. For example, let's examine a dataset which has some hypothetical information about three towns in the U.S.
 
@@ -323,7 +368,7 @@ votes
 ```
 
 
-## Topic 5: Using `ifelse()`
+## Topic 6: Using `ifelse()`
 
 In addition to creating new variables using the strategy we just learned, we can also do so with a very useful function called `ifelse()`. This function is a nice alternative to recoding or creating new variables with `[]` at times. For example,
 let's say we want to create a new categorical variable in our data set which captures if a town is considered to be a "large" or "small" district based on the total amount of voters it had that year. We can do that using square brackets in the following way:

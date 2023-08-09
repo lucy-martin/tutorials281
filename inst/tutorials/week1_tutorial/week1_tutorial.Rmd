@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Welcome!
 
-Welcome to your first week of Poli 281. For this class, we will be working closely with the R programming language and the R Studio interface, which will be discussed in this tutorial.
+Welcome to your first week of POLI 281. For this class, we will be working closely with the R programming language and the R Studio interface, which will be discussed in this tutorial.
 
 You can complete this tutorial without having yet installed R or R Studio on your computer, but do not forget to do this! Having this available on your computer is essential for the rest of the class. 
 
