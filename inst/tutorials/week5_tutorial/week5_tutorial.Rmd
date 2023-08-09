@@ -299,6 +299,17 @@ women_service
 
 ## Topic 3: Less Common `dplyr` commands
 
+In addition to the previous `dplyr` commands covered, there are a variety of additional commands which are less common but still useful. These include:
+
+* `rename()`: allows you to rename columns (variables) in your data set
+* `count()`: allows you to count the observations in a specific group. Requires that you specify a grouping variable
+* `tally()`: similar to count, but assumes that you have previously grouped your data using `group_by()`
+* `na_if()`: useful for converting a value to `NA`
+
+For more information on these commands, you can always visit their help files on the `dplyr` website. For example, [here is the help file for the `na_if()` command.](https://dplyr.tidyverse.org/reference/na_if.html).
+
+In addition, you can always reference [this cheat sheet](https://rstudio.github.io/cheatsheets/data-transformation.pdf) for additional guidance for using `dplyr`, including information about additional commands not covered in this tutorial.
+
 
 
 ## Comprehension Quiz
