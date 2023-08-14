@@ -32,12 +32,21 @@ world_values[world_values == -4] <- NA
 world_values[world_values == -2] <- NA
 world_values[world_values == -1] <- NA
 
+world_values$age_group <- ifelse(world_values$age <= 25, 1,
+                                 ifelse(world_values$age > 25 & world_values$age <= 35, 2,
+                                        ifelse(world_values$age > 35 & world_values$age <= 45, 3,
+                                               ifelse(world_values$age > 45 & world_values$age <= 55, 4,
+                                                      ifelse(world_values$age > 55 & world_values$age <= 75, 5,
+                                                             ifelse(world_values$age > 75, 6,
+                                                                    NA))))))
+
+world_values <- world_values %>% select(-age)
 
 #creation of trust_byage df for plotting 
 trust_byage <- world_values %>%
-  select(age, conf_churches) %>% #select only needed variables
-  filter(!is.na(age)) %>% #remove NAs
-  group_by(age) %>% #group by age
+  select(age_group, conf_churches) %>% #select only needed variables
+  filter(!is.na(age_group)) %>% #remove NAs
+  group_by(age_group) %>% #group by age
   summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean
 
 ```
@@ -136,34 +145,47 @@ To plot data in R, we will be using the `ggplot2` package. But before we jump in
 
 We're going to illustrate how to use `ggplot2` with an example. Today, we'll be using the World Values Survey, which here is saved as `world_values`. We have close to 95000 observations of individuals across the world about their opinions regarding government, trust in institutions, and their values. Let's say we are interested in examining how confidence in churches by the citizenship status of respondents.
 
-First, let's take a look at our data:
+First, run the following line of code to take a look at our data:
 
-```{r}
+```{r summary1, exercise = TRUE}
 
 summary(world_values)
 
 ```
 
-Okay, looks like we have a few different variables here which capture confidence, in addition to respondent citizenship status, we also have sex, age, and their socioeconomic class. First, let's re-code `citizen` so that it is easier to understand. According to the codebook, the survey asked respondents: Are you a citizen of this country?. The value `1` corresponds to "yes I am a citizen of this country" while `2` corresponds to "no, I am not a citizen of this country."
+Okay, looks like we have a few different variables here which capture confidence, in addition to respondent citizenship status, we also have sex, socioeconomic class, and the age group of respondents. For `age_group`, it is important to note that each group corresponds to the following age ranges:
 
-Below, we recode this variable to have more informative information using the `ifelse()` command.
+* Group 1 = 16-25 years old
+* Group 2 = 26-35 years old
+* Group 3 = 36-45 years old
+* Group 4 = 46-55 years old
+* Group 5 = 56-75 years old
+* Group 6 = 75 years old and above
 
-```{r}
+
+Let's re-code `citizen` so that it is easier to understand. According to the codebook, the survey asked respondents: Are you a citizen of this country?. The value `1` corresponds to "yes I am a citizen of this country" while `2` corresponds to "no, I am not a citizen of this country."
+
+Below, we recode this variable to have more informative information using the `ifelse()` command. Run the following line of code, and take a look at the new variable:
+
+```{r citizen_recode, exercise = TRUE, exercise.lines = 7}
 
 world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
                            ifelse(world_values$citizen == 2, "Non-Citizen",
                                   NA))
 
+#take a look at how many in each category
+table(world_values$citizen)
+
 ```
 
 Great. The codebook also tells us that for all confidence questions, higher values (in this case, a maximum of 4) corresponds to higher confidence, while lower values correspond to lower confidence.
 
-What would be the best way to plot the relationship between these variables? Well, first we should probably consider that we need to calculate an *average level of trust* in churches for each sex. We can do so easily using dplyr:
+What would be the best way to plot the relationship between these variables? Well, first we should probably consider that we need to calculate an *average level of trust* in churches for each sex. We can do so easily using dplyr. Execute the following line of code, and take a look at our new summarized data:
 
 
-```{r}
+```{r trust_bycitizen1, exercise = TRUE, exercise.setup = "citizen_recode"}
 
-# create new data frame called trust_bysex
+# create new data frame called trust_bycitizen
 trust_bycitizen <- world_values %>%
   select(citizen, conf_churches) %>% #select only needed variables
   filter(!is.na(citizen)) %>% #remove NAs
@@ -175,7 +197,7 @@ trust_bycitizen <- world_values %>%
 trust_bycitizen #take a look at the final DF
 ```
 
-Great! So now we have a new data frame called `trust_bycitizen` which has the mean value of confidence in churches for both citizens and non-citizens. Since we are interested in a discrete variable (citizenship) and two average values of confidence, our best bet here is a bar graph. But how do we do that? With the `ggplot` function!
+Now we have a new data frame called `trust_bycitizen` which has the mean value of confidence in churches for both citizens and non-citizens. Since we are interested in a discrete variable (citizenship) and two average values of confidence, our best bet here is a bar graph. But how do we do that? With the `ggplot` function!
 
 The `ggplot()` function begins as such:
 
@@ -185,7 +207,7 @@ ggplot(data, aes(x = ___, y = ___)
 
 ```
 
-Our first necessary argument is `data`. This is where we tell R what data we want ggplot to plot! Second, we have `aes` which stands for "aesthetics". This is where we tell R what we want to go on the X and Y axes. So, with that in mind, we would proceed as follows:
+Our first necessary argument is `data`. This is where we tell R what data we want `ggplot` to plot! Second, we have `aes` which stands for "aesthetics". This is where we tell R what we want to go on the X and Y axes. So, with that in mind, we would begin with the following code:
 
 ```{r, eval = FALSE}
 
@@ -193,11 +215,28 @@ ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust))
 
 ```
 
-Above we told `ggplot` that our data is saved as `trust_bycitizen` and on the x axis we will be plotting `citizen` while on the y axis we will be plotting `mean_trust`. 
+Above we tell `ggplot` that our data is saved as `trust_bycitizen` and on the x axis we will be plotting `citizen` while on the y axis we will be plotting `mean_trust`. 
 
-But, we're not done! We have not yet specified what *type* of graph we want. To specify that we want a bar graph, we will use the command `geom_col()`. We will add it on to our first line of code with a `+`
+But, we're not done! We have not yet specified what *type* of graph we want. To specify that we want a bar graph, we will use the option`geom_col()`. We will add it on to our first line of code with a `+`. Execute the following chunk of code to see what happens:
 
-```{r}
+```{r trust_bycitizen_df, echo = FALSE}
+## SETUP CHUNK FOR BELOW EXERCISE
+
+world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
+                           ifelse(world_values$citizen == 2, "Non-Citizen",
+                                  NA))
+
+# create new data frame called trust_bycitizen
+trust_bycitizen <- world_values %>%
+  select(citizen, conf_churches) %>% #select only needed variables
+  filter(!is.na(citizen)) %>% #remove NAs
+  group_by(citizen) %>% #group by sex
+  summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean trust for each group
+
+```
+
+
+```{r trust_plot1, exercise = TRUE, exercise.setup = "trust_bycitizen_df"}
 
 ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust)) +
   geom_col()
@@ -206,19 +245,21 @@ ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust)) +
 
 And look at that! We have a graph. Notice that non-citizens tend to have higher trust in churches.
 
-Further, there are many different types of graphs that ggplot can handle, all with their own specific command. You are not expected to memorize them. Rather, we suggest that you always take a look at [this handy cheat sheet developed by Posit](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf).
+Further, there are many different types of graphs that `ggplot` can produce. You are not expected to memorize them. Rather, we suggest that you always take a look at [this handy cheat sheet developed by Posit](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf).
 
 
 
 ### Plotting confidence in churches by respondent age
 
-Now let's examine a case of plotting two continuous variables. Instead of looking at respondent sex, we are now interested in age. What might we do in this case?
+Now let's examine a case of plotting two variables. Instead of looking at respondent sex, we are now interested in age (or in this case, age groups!). What might we do in this case?
 
-Let's first try out a scatterplot. To do so, we will add to our `ggplot` command the line `geom_point()`, which tells the function that we are interested in plotting points, or a scatter plot. We will specify `age` as our X axis variable, and `conf_churches` as our Y axis variable.
+Note that today we are using the variable `age_group`. This is to simplify things a bit, instead of using a variable which has respondents age in years. The `age_group` variable has 6 values, and we will treat it as continuous. Remember that the value of 1 correspondents to our youngest respondents, while the value of 6 corresponds to our oldest respondents.
 
-```{r}
+Let's first try out a scatterplot. To do so, we will add to our `ggplot` command the line `geom_point()`, which tells the function that we are interested in plotting points. We will specify `age_group` as our X axis variable, and `conf_churches` as our Y axis variable.
 
-ggplot(world_values, aes(x = age, y = conf_churches)) +
+```{r geom_point_test, exercise = TRUE}
+
+ggplot(world_values, aes(x = age_group, y = conf_churches)) +
   geom_point()
 
 ```
@@ -250,23 +291,23 @@ trust_byage #take a look at the final DF
 
 # create new data frame called trust_byage
 trust_byage <- world_values %>%
-  select(age, conf_churches) %>% #select only needed variables
-  filter(!is.na(age)) %>% #remove NAs
-  group_by(age) %>% #group by age
+  select(age_group, conf_churches) %>% #select only needed variables
+  filter(!is.na(age_group)) %>% #remove NAs
+  group_by(age_group) %>% #group by age
   summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean
 
-
 trust_byage #take a look at the final DF
+
 
 ```
 
 
-Great! Now that we have out `trust_byage` object to work with, we can create out line plot. You are going to do so using the code provided below, and with the following specifications:
+Great! Now that we have out `trust_byage` object to work with, we can create our plot. You are going to do so using the code provided below, and with the following specifications:
 
 - Data = `trust_byage`
-- X axis = `age`
+- X axis = `age_group`
 - Y axis = `mean_trust`
-- Comand for line graph = `geom_line()`
+- Command for line plot = `geom_line()`
 
 
 
@@ -279,29 +320,19 @@ ggplot(___, aes(x = ___, y = ___)) +
 ```
 ```{r trust_byage2-hint-1}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
   geom_line()
-
 ```
 
-This figure shows us that, in general, average trust seems to stay relatively stagnant until about 75 years old. However, it is still a little difficult to interpret. Another useful plotting technique is `geom_smooth()` which helps us by plotting a smooth line. Take a look at the following:
-
-```{r}
-
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth()
-
-```
-
-This figure helps us see a little more clearly that it is more of an inverted U relationship. That is, trust in churches seems to increase a bit until the age of 55, and then begins to decrease. Notice that there is a shaded region around the blue line. Don't worry about this too much right now, but this is called a "confidence interval"
+This figure helps us see the relationship a bit more clearly. It seems trust in churches increases with age, until about the 5th age group (55-75), and then it begins to decrease. 
 
 
 
 ## Topic 3: Improving our visualizations
 
-So far, our visualizations have done the trick, but frankly they don't look too good! Here, we're going to learn how to spruce them up a bit. This is absolutely essential, as data visualization is supposed to help make our data *more* understandable to our audience. We need to always keep this in mind!
+In the last topic, you learned to make basic graphs. But as-is, they are not super visually appealing, and are difficult to read. 
 
-Note that `ggplot2` often offers more than one way to do the following tasks. 
+There are a ton of ways to make graphs prettier by adding *options*. You are not expected to memorize all of these, but here we'll go over a couple to give you a sense for how they work. 
 
 ### Axis Labels
 
@@ -309,37 +340,40 @@ First, it is crucial to have labels on your axes that your audience can interpre
 
 ```{r}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth()
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
+  geom_line()
 
 ```
 
-Ideally, we would like to have the x-axis label be a bit more information. For example, "Age (Years)" is properly capitalized and helps our audience know the unit that we are using. To do this, we can use the `labs` argument as follows:
+Ideally, we would like to have the x-axis label be a bit more information. For example, "Age Group" is properly capitalized and helps our audience know the unit that we are using. To do this, we can use the `labs` argument as follows. Execute the following code chunk to check it out:
 
-```{r}
+```{r  trust_byage5, exercise = TRUE, exercise.lines = 7}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth() + #smooth line
-  labs(x = "Age (Years)") # x axis label
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
+ geom_point() +
+  geom_line() + 
+  labs(x = "Age Group") # x axis label
 
 ```
 
-Nice! It worked. Your turn -- why don't know add a more informative label to the y axis? Started code has been provided to you below.
+Nice! It worked. Now, why don't know add a more informative label to the y axis? Started code has been provided to you below.
 
 
-```{r age_plot, exercise = TRUE}
+```{r age_plot, exercise = TRUE, exercise.lines = 7}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth() + #smooth line
-  labs(x = "Age (Years)", #x axis label
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Age Group", #x axis label
        y = ___) # y axis label
 
 ```
 ```{r age_plot-hint-1}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth() +
-  labs(x = "Age (Years)",
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Age Group",
        y = "Avg. Confidence in Churches (1-4 scale)")
 
 ```
@@ -347,93 +381,36 @@ ggplot(trust_byage, aes(x = age, y = mean_trust)) +
 Nice job!
 
 
-### Plot Title
 
-Related to axes labels, we also want an informative title for the whole plot! The `labs` portion of our plot can be used for this as well. See below:
-
-```{r}
-
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth() + #smooth line
-  labs(x = "Age (Years)", # x axis label
-       y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") # title
-
-```
-
-### Colors and Background
-
-`ggplot2` also allows us to adjust things like the background color of our plot, in addition to the color of the lines, bars, and other elements we use. 
-
-**1) Changing the background**
+### Plot Background
 
 To many, a simple white background in a plot is preferable to a grey background. We can easily add this to our plot with the `theme_bw()` command. This indicates that we want the theme of our plot to be black and white (hence "bw").
 
 Below, add a line to the plot (remember to use the `+`) and place the line `theme_bw()` at the end of the plot.
 
-```{r age_plot2, exercise = TRUE}
+```{r age_plot2, exercise = TRUE, exercise.lines = 7}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth() + #smooth line
-  labs(x = "Age (Years)", # x axis label
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Age Group", # x axis label
        y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") #make sure to add plus
-  # add new line
+       title = "Age vs. Confidence in Churces") + 
+  ______ # add new line here with new option
 
 ```
 ```{r age_plot2-hint-1}
 
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth() + #smooth line
-  labs(x = "Age (Years)", # x axis label
+ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Age Group", # x axis label
        y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
        title = "Age vs. Confidence in Churces") + # title
   theme_bw()
 
 ```
 
-What do you notice? You should see that the background of the plot has now become white. This allows the line to pop a bit more.
-
-**2) Adjusting colors**
-
-You may also want to adjust the colors of your plot, such as the color of the line of the fill of the bars. The way you do so is often dependent on the type of plot you are making. It is always a great idea to Google how to customize a certain plot and reference the [Posit ggplot2 Cheat Sheet](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf).
-
-In the case of our smooth line plot, let's say we want to make that blue line into a black line. I can add a new arguement to our `geom_smooth` line which specifies that the line color should be black: `color = "black"`.
-
-```{r}
-
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth(color = "black") + #smooth line - make it black
-  labs(x = "Age (Years)", # x axis label
-       y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") + # title
-  theme_bw()
-
-```
-
-
-Now you try! Make the color of the line "red":
-
-```{r line_red, exercise = TRUE}
-
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth(___) + #smooth line
-  labs(x = "Age (Years)", # x axis label
-       y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") + # title
-  theme_bw()
-
-```
-```{r line_red-hint-1}
-
-ggplot(trust_byage, aes(x = age, y = mean_trust)) +
-  geom_smooth(color = "red") + #smooth line - make it red
-  labs(x = "Age (Years)", # x axis label
-       y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") + # title
-  theme_bw()
-
-```
 
 
 ## Topic 4: Practice and Comprehension Quiz
@@ -446,7 +423,7 @@ Here, we will be examining trust in the government generally speaking both by re
 * `citizen`: 2 = not a citizen of the country, 1 = citizen of the country
 * `class`: self-reported socioeconomic class from a 1-5 scale (where 1 is lower class, and 5 is upper class)
 
-First, let's recode `citizen` so it is a bit easier to interpret. Recode the variable so it has two values: "Citizen" and "Non-Citizen". Use an `ifelse()` statement to do so.
+First, let's recode `citizen` so it is a bit easier to interpret. Recode the variable so it has two values: "Citizen" and "Non-Citizen". Use an `ifelse()` statement to do so. Remember, we did this before, so this should just be a refresher!
 
 ```{r citizen, exercise = TRUE}
 
@@ -481,7 +458,6 @@ First, plot the average level of confidence in the government for citizens and n
 * Make the bars be "blue"
 * Label the x axis "Citizenship Status"
 * Label the y axis "Avg. Confidence in Gov't (1-4 scale)"
-* Provide an informative title for the figure
 * Give the figure a black and white background
 
 ```{r prepare-citizen, echo = F, eval = T}
@@ -521,8 +497,7 @@ citizen_govt <- world_values %>%
 ggplot(citizen_govt, aes(x = citizen, y = mean_trust)) +
   geom_col(fill = "blue") +
   labs(x = "Citizenship Status",
-       y = "Avg. Confidence in Gov't (1-4 scale)",
-       title = "Citizenship vs. Confidence in Gov't") +
+       y = "Avg. Confidence in Gov't (1-4 scale)") +
   theme_bw()
 
 ```
@@ -549,8 +524,7 @@ citizen_govt2 <- world_values %>%
 ggplot(citizen_govt2, aes(x = class, y = mean_trust, fill = citizen)) +
   geom_col(position = "dodge") +
   labs(x = "Socioeconomic Class",
-       y = "Avg. Confidence in Gov't (1-4 scale)",
-       title = "Class, Citizenship, and Confidence in Gov't") +
+       y = "Avg. Confidence in Gov't (1-4 scale)") +
   theme_bw()
 
 
