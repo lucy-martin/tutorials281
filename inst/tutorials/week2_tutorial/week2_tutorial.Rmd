@@ -15,311 +15,11 @@ knitr::opts_chunk$set(eval = FALSE)
 
 ## Welcome
 
-In this tutorial, you will start getting oriented with R. We will practice some basic math, learn about a few key concepts (e.g., objects), and begin to learn about "commands".
+In this tutorial, we will continue our introduction to R by exploring the topic of vectors. Understanding vectors is essential for many of the tasks you will be performing in R. We will also cover how to perform mathematical operations and other important functions with vectors.
 
-If you are ready to begin, click below!
+When you are ready, click below to get started.
 
-
-
-## Topic 1: Math in R
-
-Let's start off by becoming acquainted with R and basic commands. 
-
-First, it is important to know what a **command** is. Commands are also commonly referred to as **functions**. You will commonly hear your instructor and others use both of these terms. A **command** is a directive or order that you give to a computer program to perform a task. Commands are issued via the R Console - either by directly typing them in the console or terminal (bottom left in the image below), or by writing them in the source editor in an R Script (top left, image below) and executing them in the console. An R script is a document that you can save with all of your code to run in the future.
-
-Below, we're going to first learn how to use R in its basic form. We will then move on to some basic commands and learn about command syntax.
-
-
-![The RStudio Layout - Image Credit: Jenny Bryan at UCSB ](https://sfg-ucsb.github.io/fishery-manageR/images/rstudio_ide.png){width=60%}
-
-In your console and in the source editor, you can perform basic math. For example, below, the R code executes the command 2 + 2.
-
-```{r two-plus-two, exercise = TRUE}
-
-2 + 2  #add two plus two
-
-```
-
-Note that to execute this line of code, you can click "Run" or "Run Code". But, more effectively, you should get used to running lines of code by clicking Command + Return.
-
-Further, note here that next to the code, I included a `#` symbol along with some text which explains what that line of code is doing. This practice is called **commenting** your code, and is very important. In R, if you use the `#` symbol, everything you type following the symbol will not be recognized by R as code. Rather, you can include there text or formulas to provide some context to your code, explain what you are doing, or organize a document. Doing so is particularly useful as your code becomes more complicated. You will see comments used throughout this tutorial and throughout R documents that you receive in this class. In your own code, make sure to comment as well! You will thank yourself in the future. 
-
-
-### Basic Math {data-progressive=TRUE}
-
-Beyond addition, we can also work with other operators. Here is a list:
-  
-* Addition `+`
-* Subtraction `-`
-* Multiplication `*`
-* Division `/`
-* Exponents `^` (where 4 to the second power would be `4^2`)
-
-
-Note that R always follows the order of operations, so make sure to review good ole PEMDAS and make sure to use parentheses when necessary.
-
-Below, practice dividing 4 by 1.5:
-  
-```{r math_ex1, exercise = TRUE}
-
-```
-
-```{r math_ex1-hint-1}
-# use the / operator
-```
-```{r math_ex1-hint-2}
-4/1.5
-```
-
-We can also combine operations. For example, see the below code which multiplies the sum of 2+2 by the result of 4 divided by 1.5.
-
-```{r combo_math, eval = T}
-
-(2 + 2)*(4/1.5) 
-
-```
-
-
-Now you practice! Below, multiply 2 by 10 and divide the result by 3
-
-```{r math_ex2, exercise = TRUE}
-
-```
-```{r math_ex2-hint-1}
-
-# You will want to use (), *, and / operators here!
-
-```
-```{r math_ex2-hint-2}
-(2*10)/3
-```
-
-
-### Useful Math Commands {data-progressive=TRUE}
-
-In addition to the math we just practiced, there are math-related commands (aka functions) that use a slightly different format. Here, we will learn about our first command -- `sqrt()` -- which calculates the square root of a number. 
-
-All commands follow a general syntax. Each command has a name - in this case, it is `sqrt` which helps us to identify the command. If you want to learn more about the command, in your R console you can type `?` before the command name and press Enter. That will return the "help file" for that command, which gives you information about its name, what it does, and what the inputs are. For example, if I type `?sqrt()` into R, I will see the following in the bottom right "help" panel.
-
-
-![Help File in R](https://lh3.googleusercontent.com/drive-viewer/AAOQEOTLkNueMrXTpnBgy2taq4bXLlbC9bDah8f4G68Ojv2EdXfmJRbjJ4gO7xGE16EmqXSFsLy0YwXoAIDEQRNd_dJZZjvEOg=s1600){width=100%}
-
-
-After the name, commands are followed by parentheses. Within these parentheses, commands accept **arguments**. For some commands, this is quite straightforward and they only accept one argument. For example, with the `sqrt()` function, the only argument it accepts is **x**, what the help file states should be "a numeric or complex vector or array". For now, we'll just give it one number and see what happens.
-
-```{r sqr_nine, eval = T}
-sqrt(9)
-```
-
-
-We could also be slightly more complex, and give it an equation of interest. R will then calculate the result of that equation, and subsequently calculate the square root. For example, if we want to calculate the square root of `2*6` we would do the following:
-```{r sqr_mult, eval = T}
-sqrt(2*6)
-```
-
-
-Some commands accept more than one argument within the parentheses. We will cover these in future weeks. 
-
-
-Within R, there are some additional and similar basic math functions. For example, we can use `abs()` to calculate the absolute value of a number. This works in the same was as `sqrt()` -- you should place the number or equation of interest into the parentheses.
-
-For example, the below code calculates the absolute value of 5 (which is just 5!).
-
-```{r abs_5, eval = T}
-abs(5)
-```
-
-
-You try! Below, calculate the absolute value of -8.
-```{r math_ex3, exercise = TRUE}
-
-```
-
-```{r math_ex3-hint-1}
-abs(___) #fill this in
-```
-```{r math_ex3-hint-2}
-abs(-8)
-```
-
-
-## Topic 2: Objects
-
-Say you want to save something in R for future use within your code. You can do so by creating an **object**. If you are familiar with other coding languages, some refer to objects as **variables**. Objects store information in R -- whether that be a single number or a full data frame, in addition to other types of data that we will learn about in this class. 
-
-Today, we will begin by assigning basic numbers to objects. To do so, we will use the `<-` operator. In the below code, the number 1 is stored as an object called `object1` using the `<-` operator. 
-
-```{r}
-object1 <- 1
-```
-
-Note that it is not *necessary* to include a space before and after `<-`. However, it is strongly suggested, as it can create errors in your code when it becomes more complicated. See that the below code works just as well without spaces.
-
-```{r, eval = TRUE}
-object1<-1 #no spaces
-
-object1 #return the object
-```
-
-It is also important to note that when you create an object, you need to explicitly **return the object** (or type out the object name, and run that line of code) to see its contents. For example, if I just assign the number 1 to `object1` below, it will save, but I will not see the result. You can also check out the value in your Global Environment (type right panel in R Studio).
-
-```{r, eval = TRUE}
-object1 <- 1 #assign to object 1
-```
-
-However, if I want to then see the number which I assigned to `object1`, I would have to do the following:
-
-```{r, eval = TRUE}
-object1 <- 1 #assign to object 1
-
-object1 #return the object
-```
-
-With this all in mind, it is now your turn to practice! Create an object called `birth_year` where you save the number corresponding to the year you were born.
-
-```{r birthyear, exercise = TRUE}
-
-```
-
-```{r birthyear-hint}
-birthyear <- ______ #fill this in with your birth year
-```
-
-
-Further, you can name objects almost anything you want! With some exceptions:
-
-* You **cannot** name an object a number on its own. For example, an object cannot be named `2011`, but it could be named `year_2011`
-* You **cannot** name an object with a symbol on its own. For example, an object cannot be named `__`, but it could be named `year__`
-
-
-```{r, eval = TRUE}
-2011 <- 2011 # see error
-
-year_2011 <- 2011 # but this works!
-
-```
-
-
-In sum:
-
-* The spaces between `object1` and `<-` are not necessary, but that is best practice. 
-* In order to see the contents of an object, you must explicitly return that object
-* You can save objects as *almost* anything! It can be `object1`, `object2`, `cat`, `anything`. But you cannot use numbers or symbols on their own.
-
-
-
-### Objects don't have to be numbers!
-
-Objects can also be text, but we have to wrap the text in quotation marks. For example, see below:
-
-```{r, eval = T}
-
-object2 <- "Hi there!" #save Hi there! in object
-
-object2 #return the object
-
-```
-
-
-Now you try, save your name into an object called `my_name`.
-
-```{r obj_ex3, exercise = TRUE}
-
-```
-```{r obj_ex3-hint-1}
-
-my_name <- ____ #put your name here
-
-```
-```{r obj_ex3-hint-2}
-
-my_name <- "YOUR NAME HERE"
-
-```
-
-
-In class this week, we will also be learning about a third class of data -- Booleans or logicals -- which can also be combined into vectors using the `c()` command. 
-
-
-### We can combine objects and arithmetic
-
-If we are using numerical objects we can also execute mathematical operations with these objects. For example, in the blow chunk of code, I am adding together two fictional percentages of party affiliated voters in a state. I create an object called `republicans` which is equal to 45 and an object called `democrats` which is equal to 55. I then add then together. 
-
-```{r, eval = TRUE}
-
-#create initial objects
-republicans <- 45
-democrats <- 55
-
-#add them together
-total_voters <- republicans + democrats
-
-#return the result
-total_voters
-
-# I could also just add them together without saving them as an object
-# but then this value is not saved
-republicans + democrats
-
-```
-
-Now you try! 
-
-In the below chunk of code, do the following:
-
-* Create an object called `days_rain` which captures the number of days that rained in a town. Set this object equal to 70.
-* Create an object called `days_no_rain` which captures the number of days that it did NOT rain. This should be equal to 295 (365 days - 70 days)
-* Then, subtract `days_rain` from `days_no_rain` and save this into an object called `rain_diff`
-* Return the value of `rain_diff`
-
-```{r obj_ex4, exercise = TRUE}
-
-
-
-
-```
-```{r obj_ex4-hint-1}
-
-#create initial objects
-days_rain < - ___
-days_no_rain <- ___
-
-#create new object for difference
-_____
-
-#return difference
-_____
-```
-```{r obj_ex4-hint-2}
-
-#create initial objects
-days_rain < - ___
-days_no_rain <- ___
-
-#create new object for difference
-rain_diff <- _____ - _____
-
-#return difference
-rain_diff
-```
-```{r obj_ex4-hint-3}
-
-#create initial objects
-days_rain < 70
-days_no_rain <- 295
-
-#create new object for difference
-rain_diff <- days_no_rain - days_no_rain
-
-#return difference
-rain_diff
-
-```
-
-
-
-
-## Topic 2: Vectors
+## Topic 1: Vectors
 
 **Vectors** are an important building block of databases and data frames. A vector is a type of object, just like we created before, but it involves **MULTIPLE** elements. Vectors are very useful because they can end up serving as either a row or a column of a database.
 
@@ -331,7 +31,7 @@ An essential command to create vectors is the `c()` command, which stands for "c
 
 For example, the below chunk of code uses the `c()` command to combine four numbers to create a vector called `first_vector`.
 
-```{r, eval = TRUE}
+```{r, first-vector, eval = TRUE, exercise = TRUE}
 
 first_vector <- c(1, 5, 6, 8) # create the vector
 first_vector # return the vector to see output and ensure it worked
@@ -341,7 +41,7 @@ first_vector # return the vector to see output and ensure it worked
 
 Note that vectors can also combine non-numerical elements. As we did before, when we are dealing with characters, we have to use `" "` to make sure R knows these are character elements. For example:
 
-```{r, eval = TRUE}
+```{r, first-vector2, eval = TRUE, exercise = TRUE}
 
 second_vector <- c("I", "love", "political", "science") # create the vector
 
@@ -373,7 +73,7 @@ my_name <- c("Your", "Name", "Here")
 ```
 
 
-## Topic 3: Math with Vectors
+## Topic 2: Math with Vectors
 
 Now that we are able to create vectors, we can also do math with vectors. The below video will walk you through how we can perform mathematical operations with vectors.
 
@@ -412,7 +112,9 @@ sum_protest # return the result
 
 ```
 
-`R` also has several built-in functions that allow us to perform mathematical operations on vectors. Two of them will be especially helpful as you move forward. The first function, mean(), calculates the arithmetic mean of a vector. The second function, sum(), calculates the sum of a vector. To see how these functions work, let's compute the mean and the sum of our `protest_15` vector.
+### Using Math to Summarize Vectors
+
+So far we have used math on vectors to create a whole new ***vector***.  Now we're going to see some math commands that you can perform on vectors to produce a ***single number***. R also has a number of built-in functions that will help us with this task. Two of them will be especially helpful as you move forward. The first function, mean(), calculates the arithmetic mean of a vector. The second function, sum(), calculates the sum of a vector. To see how these functions work, let's compute the mean and the sum of our `protest_15` vector.
 
 ```{r protest_add3, exercise = TRUE, exercise.setup = "protest"}
 
@@ -431,7 +133,7 @@ Create two vectors with the following information:
 
 NOTE: Do not include the `%` sign when you are creating these vectors. Just type the number corresponding to the percent (e.g., 88 for 88%).
 
-Then, calculate the difference in attendance between class 1 and class 2 for each day of the week. Save this in an object called `class_diff`.
+Calculate the difference between the attendance percentages of Class 1 and Class 2 for each day of the week by subtracting the Class 2 percentage from the Class 1 percentage. Save this in an object called `class_diff`.
 
 Below, some initial code has been provided to you to help you out. Use this code as a starting place to complete this task.
  
@@ -445,7 +147,7 @@ class2 <-
 
 # then calculate the difference for each day
 
-____ <- _____ + ______
+____ <- _____ - ______
 
 ```
 
@@ -480,14 +182,12 @@ class_diff <- class1 - class2
 
 ```
 
-
-
-## Topic 4: Naming Vectors
+## Topic 3: Naming Vectors
 
 Now that we have objects with multiple elements, it can also be useful to name those elements. This can help us keep track of the information a little bit better. For example, let's return to the example of protest. We are tracking the number of protests across three towns/cities in the years 2015 and 2016. But before, we didn't label those cities by name. But, we can do this, using the `names()` function. See below to see how it works
 
 
-```{r, eval = TRUE}
+```{r, protest1, eval = TRUE, exercise = TRUE}
 # first create my vectors
 protest_15 <- c(5, 10, 8)
 protest_16 <- c(2, 7, 3)
@@ -508,7 +208,7 @@ When you now return the object, you will see that each element of the vector wil
 
 Since we have two objects which we are giving the same names, we can also save those names in a separate character vector, and do the following:
 
-```{r, eval = TRUE}
+```{r, protest2, eval = TRUE, exercise = TRUE}
 # first create my vectors
 protest_15 <- c(5, 10, 8)
 protest_16 <- c(2, 7, 3)
@@ -516,7 +216,10 @@ protest_16 <- c(2, 7, 3)
 # now, use the names function to give these two objects names
 cities <- c("Chapel Hill", "Durham", "Raleigh")
 
+# take the vector protest_15, and assign each element a name based on whatever text is in the vector called cities
 names(protest_15) <- cities
+
+# now do the same for the protest_16 vector
 names(protest_16) <- cities
 
 
@@ -569,17 +272,17 @@ names(wins_men) <- c("UNC", "Duke", "NC State")
 
 
 
-## Topic 5: Selecting an Element of a Vector
+## Topic 4: Selecting an Element of a Vector
 
 Vectors are objects which store multiple elements of data. While this is great, it is important that we are still about to select certain elements, or parts, of those vectors. We will learn about this more in depth in class, but will provide an introduction and some practice here. 
 
-The most basic way to select an element is by indexing a vector, either using:
+The most basic way to select an element is by what we will call “indexing” a vector. To do this in R, you can put square brackets `([])` after the name of a vector. Then inside the brackets, you can select a particular element by putting either:
 
 1. The name of that element
 2. The physical place of an element in a vector (e.g., it is the first or second element)
 
 
-So, for example, let's revisit that vector you created with the number of men's basketball NCAA champsionships. Say we want to isolate how many wins UNC had. We can select that element using square brackets, or `[]`. See below
+So, for example, let's revisit that vector you created with the number of men's basketball NCAA championships. Say we want to isolate how many wins UNC had. We can select that element using square brackets, or `[]`. See below
 
 ```{r mens_bball, exercise=TRUE, eval = TRUE}
 # create the vector
@@ -596,6 +299,12 @@ wins_men["UNC"]
 wins_men[1]
 
 ```
+
+Let's look at what the code did above. It created the vector wins_men and named the elements of the vector using `name()`. We then indexed to select just the UNC information in two ways:
+
+1. By using the name of the element we wanted: `wins_men[“UNC”]`
+2. By using the fact that UNC is the first element of the vector: `wins_men[1]`
+
 
 You can also select multiple elements! If you want to do this, you will have to use the `c()` command within the `[]`. See below for how we would select *both* UNC and Duke wins.
 
@@ -626,7 +335,7 @@ Now, you try! We will now take a look at the NCAA women's basketball teams that 
 * South Carolina - 2
 * Notre Dame - 2
 
-Name this vector such that each element correspond's to its school name. Then, using `[]`, show the following information:
+Name this vector such that each element corresponds to its school name. Then, using `[]`, show the following information:
 
 1. How many wins did Notre Dame have?
 2. How many wins did Notre Dame AND Baylor have?
@@ -640,7 +349,7 @@ You have been given some code below to get you started. Fill in the code as nece
 wins_women <- c(___)
 
 # then name the vector
-names(wins_women) <- c("___", ___, ___, ___)
+names(wins_women) <- c("___", "___", "___", "___")
 
 
 # How many wins did Notre Dame have?
@@ -716,14 +425,4 @@ wins_women[5]
 
 
 ```
-
-## Comprehension Quiz
-
-Please complete the quiz to evaluate your comprehension using the following link:
-
-[Link to quiz here](https://unc.az1.qualtrics.com/jfe/form/SV_6FrA8s75GnkTnGm)
-
-
-
-
 
