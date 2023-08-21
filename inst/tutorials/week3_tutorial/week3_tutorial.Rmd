@@ -17,9 +17,9 @@ data(mtcars)
 
 ## Welcome 
 
-In this tutorial, you will learn about two topics. First, you will learn how computers store files. This will give you a foundation for understanding how to import data into R. Second, we will learn about two-dimensional R objects. We will learn about two types, called **matrices** (singular: matrix) and **data frames**. We will primarily work with data frames, as they are more flexible. 
+In this tutorial, you will learn about two overarching themes. First, we'll learn about two-dimensional R objects. We will learn about two types, called **matrices** (singular: matrix) and **data frames**. We will primarily work with data frames, as they are more flexible. Second, we;ll learn about how computers store files. This will give you a foundation for understanding how to import data into R.
 
-These types of data are 2D because they have both rows *and* column, while before we were working with just one-dimensional data which could be described as only a row *or* a column. For example, say we have some data about cars. A one-dimensional object may have looked just like a list of the names of the cars, like this:
+When we discuss two-dimension R objects, we refer to them as such because they have both rows *and* columns, while before we were working with just one-dimensional data which could be described as only a row *or* a column. For example, say we have some data about cars. A one-dimensional object may have looked just like a list of the names of the cars, like this:
 
 
 ```{r, echo = F, eval = T}
@@ -29,161 +29,50 @@ cars
 ```
 
 
-But now with two-dimensional data, it will take on a more complex format. For example, below we now see those five car names, and each one corresponds to a **row** in our data. Along the top, we now see names for **column** which contain additional information about each car -- or row. For instance, we see that the Mazda Rx4 has 21 miles per gallon, while the Datsun 710 has 22.8
+But now with two-dimensional data, it will take on a more complex format. For example, below we now see those five car names, and each one corresponds to a **row** in our data. Along the top, we now see names for **column** which contain additional information about each car -- or row. For instance, we see that the Mazda Rx4 has 21 miles per gallon, while the Datsun 710 has 22.8. In this class we’ll also refer to columns as “variables”, and rows as “observations”. 
 
 ```{r, echo = F, eval = T}
 head(mtcars[1:5, 1:5])
 ```
 
-## Topic 1: How Computers Store Files
 
-To fully harness the power of R for data analysis and manipulation, it's important to understand how computers store files and how R interacts with them. Armed with this knowledge, you will be able to seamlessly load data sets, analyze them, and save the results! 
+## Topic 1: Data Frames
 
-### The Basics
+Data frames are a flexible, 2D form of data. They are able to handle multiple types of data in the same object, including numbers, text, and Boolean data types. Soon, we will learn how to import data sets into R. For now, to keep things simpler, we’ll primarily work with some data sets that we’ve created for you. 
 
-Let's start with the basics. Your computer's storage system is organized into *folders*, which can contain additional folders and *files*. These files consist of collections of data, such as text, pictures, videos, and more. Each file has a unique location on your hard drive, which we can access using something called a *path*. A file path is the address that specifies the location of a file on your computer's storage system. It's like giving directions to R on where to find the data you want to work with! 
+In order to use a dataset in R, you’ll first need to save it as an object. The code below creates an object for a data set that’s built into R, called mtcars. You can see below that each row (observation) is a different car model, and each column (variable) is a piece of information about that particular car. 
 
-Suppose we have the file data.csv located in a folder called "Documents." Let's look at how the file paths would appear on both Windows and macOS:
+```{r save_data, exercise = TRUE}
 
-- On Windows, the file path to data.csv would be `"C:/Users/Guest/Documents/data.csv"`.
+#save mtcars data into object
+mtcars <- mtcars
 
-- On macOS, the file path to data.csv would be `"/Users/Guest/Documents/data.csv"`.
-
-### Checking Your Working Directory
-
-Finally, R has what's called a *working directory*. The working directory is the default location where R looks for files and saves outputs if no path is specified. You can check the current working directory in R using the `getwd()` function:
-
-```{r eval = F}
-getwd() #check the current working directory
-```
-
-Okay, before we move on to the next topic, take a moment to create a special folder to store all of your materials for this class. Having a dedicated POLI 281 folder will help keep your R scripts, data files, and any other class-related materials in one place, making them easier to manage and locate throughout the course!
-
-## Topic 2: Data Frames
-
-Data frames are a flexible, 2D form of data. They are able to handle multiple types of data in the same object, including numbers, text, and Boolean data types.
-
-To create data frames, we will use a new command: `data.frame()`. The `data.frame()` function works by accepting a series of vectors and binding them together to create, you guessed it, a data frame! Let's see the example below to understand a bit better.
-
-
-Below, the code creates a data frame called `newspaper_data`. This data frame contains information about four of the top newspapers in the United States. It has three variables, or columns: the name of the newspaper (`name`), the number of subscribers in 2019 (`n_subscribe`), and the location of the headquarters (`head_q`).
-
-```{r, eval = T}
-
-#create data frame
-newspaper_data <- data.frame(name = c("USA Today", "Wall Street Journal",
-                                      "The New York Times", "New York Post"),
-                             #first column/variable
-                             
-                             n_subscribe = c(1621091, 1011200, 483701, 426129),
-                             #second column/variable
-                             
-                             head_q = c("Virginia", "New York", "New York",
-                                        "New York")
-                             #third column/variable
-                             
-                             ) #close the command
-
-
-
-#return the data frame
-newspaper_data
-
+#look at the data set
+mtcars
 ```
 
 
-Notice that each of the elements that the `data.frame()` function accepts is really just a vector. So, alternatively, you could create the same data frame in the following way:
+### Using a Saved Dataframe
 
-```{r, eval = T}
+Often, we want to look at or examine a data frame you’ve saved as an object. One easy way to do this is using the `View()` command – note the capital “V”! This will open the data frame in a new tab where you can look at it. 
 
-#create vectors for the variables
-name <- c("USA Today", "Wall Street Journal", "The New York Times",
-          "New York Post")
-n_subscribe <- c(1621091, 1011200, 483701, 426129)
-head_q <- c("Virginia", "New York", "New York", "New York")
 
-#create data frame
-newspaper_data <- data.frame(name = name, 
-                             #assign name variable to the name vector
-                             
-                             n_subscribe = n_subscribe,
-                             
-                             #assign n_subscribe variable to corresponding vector
-                             head_q = head_q
-                             #assign head_q variable to corresponding vector
-                             )
+```{r, echo = T, eval = T}
 
-#return the data frame
-newspaper_data
+#View() data
+# View(mtcars) - doesn't work
 
 ```
 
-This will only work if each of those vectors has the same *number of elements*, which translates to the number of rows in the data frame.
+Other times, we want to look at, or run commands on, a single variable (column) within a dataframe. While there are multiple ways to do this, one easy way is using the `$` notation. Here’s an example: say we want to use the `cyl` column within the `mtcars` dataframe. We could write:
 
-It is also possible to modify the data frame in other ways. Suppose you want to add a new column showing the year each newspaper was founded. We can do this using the `cbind()` command.
+```{r view_var, exercise = TRUE}
 
-```{r, eval = T}
-#create a vector corresponding to each newspaper's founding year
-founded <- c(1982, 1889, 1851, 1801)
-
-#use the cbind() command to add “Year_Founded” to the dataframe 
-newspaper_data <- cbind(newspaper_data, Year_Founded = founded)
-
-#return the data frame
-newspaper_data
-```
-
-We can use a related command called `rbind()` to add new rows to existing data frames. Suppose, for example, you go out and collect additional data for another newspaper, the Guardian. This is a British newspaper that has 111,155 subscribers, has its headquarters in London, and has been in business since 1821. Let’s add this information to our existing data frame.  
-
-```{r, eval = T}
-# create a new data frame for the Guardian
-new_row <- data.frame(
-  name = "The Guardian",
-  n_subscribe = 111155,
-  head_q = "London",
-  Year_Founded = 1821
-)
-
-# use rbind() to add the new row to our existing data frame
-newspaper_data <- rbind(newspaper_data, new_row)
-
-# return the data frame
-newspaper_data
-```
-
-We can also create new variables and add them to our existing data frame using the `$` sign.  Perhaps we want to add a variable corresponding to the country in which each newspaper is based. We can do this as follows.
-
-```{r, eval = T}
-#create a vector corresponding to the country in which each newspaper is based
-country <- c("USA", "USA", "USA", "USA", "UK")
-
-#use the $ sign to add this variable to our existing data frame 
-newspaper_data$country <- country
-
-#return the data frame 
-newspaper_data
-```
-
-In last week's lesson, we learned some basic arithmetic operations in R, such as `+` and `-`. We can use these operators to create new variables as well! Suppose we want to create a variable that indicates the age of each newspaper. To do this, we need to subtract the founding year (`Year_Founded`) from the current year (2023). We will combine the `-` operator and the `$` sign introduced above. 
-
-```{r, eval = T}
-#create the age variable using the $ sign and the subtraction operator
-newspaper_data$age <- 2023 - newspaper_data$Year_Founded
-
-#return the data frame
-newspaper_data
-```
-
-As you can see, the New York Post is the oldest newspaper in the data frame at a whopping 222 years, while USA Today is the youngest at 41 years!
-
-### Summarizing the Data Frame
-
-Now, say you want to examine that new data frame without returning the whole thing. A useful command here would be the `summary()` command. This command returns information about each of the variables. In the case of the character variables, it will tell you what class they are (character vs. numeric, for example) and the length of that variable (how many rows). In the case of numeric variables, it will give you useful information such as the minimum value, the maximum, etc. See below!
-
-```{r, eval = T}
-summary(newspaper_data) #summarize the data
+mtcars$cyl
 
 ```
+
+This notation has a lot of other uses that you’ll learn soon. 
 
 Further, sometimes you will have a data frame with a *lot* of rows. In those cases, it may not be practice to take a look at the full object. Instead, you can use the command `head()` to just see the first few rows of the data frame. In the case of the `newspaper_data` object, we only have a few rows. But, let's use this to summarize the mtcars data, which is some built in data in R about cars (we looked at in the beginning of this tutorial):
 
@@ -192,8 +81,7 @@ Further, sometimes you will have a data frame with a *lot* of rows. In those cas
 head(mtcars) #return the first few rows
 ```
 
-
-In addition, it can be useful to query R about how many rows you have (or observations), how many columns (or variables), or the full dimensions of your data frame.
+Finally, there are some commands that you can apply to whole dataframes to find out information like the number of rows and columns.
 
 To ask R how many rows (or observations) or data has, we can use the command `nrow()`. This command accepts the name of the data frame, and returns the number of rows.
 ```{r, eval = T}
@@ -212,79 +100,25 @@ We can use `dim()` to ask R how many rows *and* columns a data frame has.
 dim(mtcars) #32 rows, 11 columns
 ```
 
-Remember the `$` sign introduced above? We can use this to access specific columns in a data frame. Perhaps we want to look at the `mpg` column in the `mtcars` data.
+Now, say you want to examine that new data frame without returning the whole thing. A useful command here would be the `summary()` command. This command returns information about each of the variables. In the case of the character variables, it will tell you what class they are (character vs. numeric, for example) and the length of that variable (how many rows). In the case of numeric variables, it will give you useful information such as the minimum value, the maximum, etc. See below!
 
 ```{r, eval = T}
-mtcars$mpg
+summary(mtcars) #summarize the data
+
 ```
 
-As you can see, using the `$` sign returns the values of the `mpg` variable!
 
 ### Practice
 
-Your turn! Create a new data frame called `large_cities` which will contain information about the top five largest cities in the United States. This data frame will have four variables:
+Your turn! We're going to use what we just learned to explore a data set we have created for you, called `large_cities` which contains information about the top five largest cities in the United States. This data frame hase four variables:
 
 * `city`: the name of the city
 * `state`: the state where that city is located
 * `population`: the population of that city as of 2020
 * `mayor`: the name of the mayor of that city in 2023
 
-Here is the information for each of the cities of interst:
 
-* New York City: State = New York, Population = 8,622,357, Mayor = Eric Adams
-* Los Angeles: State = California, Population = 4,085,014, Mayor = Karen Bass
-* Chicago: State = Illinois, Population = 2,670,406, Mayor = Lori Lightfoot
-* Houston: State = Texas, Population = 2,378,146, Mayor = Sylvester Turner
-
-After you create this data frame, use `dim()` to check that your data frame has the correct number of rows and columns: 4 and 4! You have been provided with some code below to get you stared.
-
-
-```{r mayor_ex, exercise = TRUE}
-
-#first: create vectors for the variables - you can also just place these
-# directly into the data.frame() function
-city <- c(___)
-state <- c(___)
-population <- c(___)
-mayor <- c(___)
-
-#second: specify the variables in the data.frame() function
-large_cities <- data.frame(___)
-
-
-#return your object
-___
-
-#check dimensions
-___(___)
-
-```
-```{r mayor_ex-hint-1}
-
-#first: create vectors for the variables - you can also just place these
-# directly into the data.frame() function
-
-city <- c(___)
-state <- c(___)
-population <- c(___)
-mayor <- c(___)
-
-
-#specify the variables in the data.frame() function
-large_cities <- data.frame(city = ___,
-                             state = ___,
-                             population = ___,
-                             mayor = ___)
-
-
-#return your object
-___
-
-#check dimensions
-___(___)
-
-```
-```{r mayor_ex-hint-3}
+```{r large_cities, eval = T, echo = F}
 #create vectors for the variables
 city <- c("New York City", "Los Angeles", "Chicago", "Houston")
 state <- c("New York", "California", "Illinois", "Texas")
@@ -297,18 +131,59 @@ large_cities <- data.frame(city = city,
                              state = state,
                              population = population,
                              mayor = mayor)
-#return the data frame
-large_cities
 
-#check dimensions
-dim(large_cities)
+
+```
+
+First, take a look at the data using the `View()` and `summary()` commands:
+
+```{r large_cities_ex1, exercise = TRUE, exercise.setup = "large_cities", exercise.lines = 6}
+
+
+```
+```{r large_cities_ex1-hint-1}
+#View
+View(large_cities)
+
+#summary
+summary(large_cities)
+
 ```
 
 
-## Topic 3: Indexing Data Frames
+Next, determine how many columns this data set has using `ncol()` and how many observations it has using `nrow()`. Finally, put that together by using `dim()` to get the full dimensions of the data set.
 
 
-Just like with vectors, it can be useful with data frames to select certain element(s) of our data. Before with vectors, we only needed to indicate the name of the element or its place within the vector using `[]`. Now, with data frames, we have to be cognizant of both the element(s) place in terms of rows AND columns.
+```{r large_cities_ex2, exercise = TRUE, exercise.setup = "large_cities"}
+#columns
+
+#rows/observations
+
+#dimensions
+
+```
+```{r large_cities_ex2-hint-1}
+#columns
+ncol(large_cities)
+
+#rows/observations
+nrow(large_cities)
+
+#dimensions
+dim(large_cities)
+
+```
+
+
+
+
+## Topic 2: Indexing Data Frames
+
+
+Just like with vectors, it can be useful with data frames to select certain element(s) of our data. On the previous page, you learned that you can use the “$” notation to access a particular variable. 
+
+This lesson teaches you to access particular rows, columns, or individual cells of a data frame. Before with vectors, we only needed to indicate the name of the element or its place within the vector using `[]`. Now, with data frames, we have to be cognizant of both the element(s) place in terms of rows AND columns.
+
 
 The syntax for indexing is as follows:
 
@@ -316,132 +191,65 @@ The syntax for indexing is as follows:
 
 To properly index, you MUST follow this order -- rows first, columns second. You cannot switch the order and index first by column and then row. To help you remember the order, a useful mnemonic device is to remember Roman Catholic (R always comes before C!).
 
-As with vectors, you can index both by elements' names or place within a dataframe. Again, we suggest typically using names as it might be difficult to exactly determine an element's location within the data frame. However, there are cases where both are useful.
+As with vectors, you can index both by elements' names or place within a data frame. Again, we suggest typically using names as it might be difficult to exactly determine an element's location within the data frame. However, there are cases where both are useful.
 
-Let's return to the previous example where we looked at the largest cities in the U.S. We are going to create our data frame again, and then index a few elements to demonstrate how it works.
+Let's return to the previous example where we looked at the largest cities in the U.S. We will index a few elements of this data frame to demonstrate how this works. 
 
-```{r, eval = T}
-# First: Create the data frame
+First, say you want to just look at a single cell of the data set - for example, the 3rd row, 2nd column. You can do so using the following code:
 
-#create vectors for the variables
-city <- c("New York City", "Los Angeles", "Chicago", "Houston")
-state <- c("New York", "California", "Illinois", "Texas")
-population <- c(8622357, 4085014, 2670406, 2378146)
-mayor <- c("Eric Adams", "Karen Bass", "Lori Lightfoot", "Sylvester Turner")
+```{r indexing1, exercise = TRUE, exercise.setup = "large_cities"}
+large_cities[3, 2]
+```
+
+Maybe instead you want to look at the whole third row. To do so, you would then leave the columns portion of the brackets blank. This tells R to show you everything in the third row. See below:
+
+```{r indexing2, exercise = TRUE, exercise.setup = "large_cities"}
+large_cities[3, ]
+```
+
+Or, what if you want to look at the full third column across all rows of data. To do so, we would leave the first space blank within our `[]`, indicating we want all rows. But, we would specify `3` for the column space, to indicate we just want the third column, like so:
+
+```{r indexing3, exercise = TRUE, exercise.setup = "large_cities"}
+large_cities[ ,3]
+```
+
+Beyond indexing by column or row **number**, we can also do so by the name of columns as well. For example, if we just want to take a look at the variable (or column) corresponding to `population`, we would do so as follows:
+
+```{r indexing4, exercise = TRUE, exercise.setup = "large_cities"}
+large_cities[ ,"population"]
+```
+
+We can also do so for multiple columns, like both `city` and `mayor`. To do so, we would put both of these columns into a `c()` command, and place them within the `[]`, like so: 
 
 
-#create data frame
-large_cities <- data.frame(city = city,
-                             state = state,
-                             population = population,
-                             mayor = mayor)
+```{r indexing5, exercise = TRUE, exercise.setup = "large_cities"}
 
-
-
-# Now - index the data frame:
-
-#### 1) index to only look at data about population
-large_cities[ , "population"]
-
-
-### 2) index to look at the population for the first city in our data frame
-large_cities[1, "population"]
-
-
-### 3) index to look only at city and mayor
 large_cities[ , c("city", "mayor")]
 
 ```
 
+We can also combine indexing by numbers and variable names. For example, if we want to know the `mayor` but only for the first row of our data set, we would use the following code:
 
-So, there are a few things to note here.
+```{r indexing6, exercise = TRUE, exercise.setup = "large_cities"}
 
- * First: if you are ONLY indexing by row OR column (such as in examples 1 and 3), you leave the other corresponding space in the brackets blank. So, in example one, we have `large_cities[ , "population"]`. This effectively tells R to return ALL rows, but only the column corresponding to population
- * Second: You can combine indexing by number and row or column name. In the case of the current data frame, we have column names (variables), but we do not have row names. So, in the second example we instructed R to return information on population, but only for the first row or observation.
- * Third: Just like with vectors, we can index by multiple names or numbers. In the third example, we used the `c()` command to return information on both city name and mayor name for all observations in our data set.
+large_cities[1, "mayor"]
+
+```
+
+
+
+So, a few things to recap here:
+
+ * First: if you are ONLY indexing by row OR column (such as in examples 1 and 3), you leave the other corresponding space in the brackets blank. So, for example, earlier we wrote `large_cities[ , "population"]`. This effectively tells R to return ALL rows, but only the column corresponding to population
+ * Second: You can combine indexing by number and row or column name.
+ * Third: Just like with vectors, we can index by multiple names or numbers. Above, we used the `c()` command to return information on both city name and mayor name for all observations in our data set.
  
  
 ### Practice
 
-Now you try. The below code creates a data frame, called `pres_fave` for you about a few presidents' favorite flowers and plants. This is fictitious information. Using `[]`, index the data frame in the following ways:
+Now you try. The below code creates a data frame, called `pres_fave` for you about a few presidents' favorite flowers and plants. This is fictitious information. Using this data, index the data in the following ways:
 
-1) Return only the `president` and `fruit` columns
-2) Return the value for `flower` from the 5th observation
-3) Return the 1st, 3rd, and 6th observations
-
-```{r pres_fave, exercise = TRUE}
-
-pres_fave <- data.frame(president = c("Obama", "Reagan", "Carter", "Kennedy",
-                                      "Eisenhower", "Lincoln"),
-                        flower = c("Tulip", "Hydrangea", "Petunia", "Allium",
-                                   "Crocus", "Lotus"),
-                        fruit = c("Apple", "Banana", "Apple", "Peach",
-                                  "Blueberry", "Pear"))
-
-
-
-# 1) President and Fruit
-
-
-#2) Flower and fifth observation
-
-
-#3) 1st, 3rd, 6th observations
-
-
-
-
-```
-```{r pres_fave-hint-1}
-
-# 1) President and Fruit
-pres_fave[]
-
-#2) Flower and fifth observation
-pres_fave[]
-
-
-#3) 1st, 3rd, 6th observations
-pres_fave[]
-
-```
-```{r pres_fave-hint-2}
-
-# 1) President and Fruit
-pres_fave[ , c()]
-
-#2) Flower and fifth observation
-pres_fave[___,"flower"]
-
-
-#3) 1st, 3rd, 6th observations
-pres_fave[c(___, ___, ___), ]
-
-```
-```{r pres_fave-hint-3}
-
-# 1) President and Fruit
-pres_fave[ , c("president", "fruit")]
-
-#2) Flower and fifth observation
-pres_fave[5,"flower"]
-
-
-#3) 1st, 3rd, 6th observations
-pres_fave[c(1, 3, 6), ]
-
-```
-
-
-## Topic 4: Indexing Data Frames with Conditionals
-
-Another important skill for indexing data frames is using something called **conditional statements**. These are statements which evaluate if a certain *condition* is met, and returns data based on satisfying this condition. 
-
-For example, say we have our same data about presidents and their favorite flowers and fruits. We'll add a few more observations to that than before. First, run the following line of code which creates our data frame. Then check it out.
-
-```{r pres_fave2, exercise = T}
-
-#create data frame
+```{r pres_fave_data, echo = F, eval = T}
 pres_fave <- data.frame(president = c("Obama", "Reagan", "Carter", "Kennedy",
                                       "Eisenhower", "Lincoln", "Nixon", 
                                       "Roosevelt", "Jackson"),
@@ -452,17 +260,69 @@ pres_fave <- data.frame(president = c("Obama", "Reagan", "Carter", "Kennedy",
                                   "Blueberry", "Pear", "Tangerine", "Banana",
                                   "Pear"))
 
-#check out data frame
-pres_fave
 ```
 
-With this, we can start indexing. To index a data frame using conditions, it is important to keep the syntax in mind. We will be adapting syntax we used before, which was:
+1) Return only the `president` and `fruit` columns
+3) Return the 1st, 3rd, and 6th observations
+
+First, use `View()` to take a look at the data:
+
+```{r pres_ex1, exercise = TRUE}
+View(pres_fave)
+```
+
+Great! Try just returning the second row of the data:
+
+```{r pres_ex2, exercise = TRUE, exercise.setup = "pres_fave_data"}
+
+
+```
+```{r pres_ex2-hint-1}
+pres_fave[,]
+```
+```{r pres_ex2-hint-2}
+pres_fave[2,]
+```
+
+Now, return the value for `flower` from the 5th observation.
+
+```{r pres_ex3, exercise = TRUE, exercise.setup = "pres_fave_data"}
+
+
+```
+```{r pres_ex3-hint-1}
+pres_fave[,]
+```
+```{r pres_ex3-hint-2}
+pres_fave[5,"flower"]
+```
+
+Finally, return both the `president` and `fruit` columns, but for all rows:
+
+```{r pres_ex4, exercise = TRUE, exercise.setup = "pres_fave_data"}
+
+
+```
+```{r pres_ex4-hint-1}
+pres_fave[,]
+```
+```{r pres_ex4-hint-2}
+pres_fave[ , c("president", "fruit")]
+```
+
+## Topic 3: Indexing Data Frames with Conditionals
+
+Another important skill for indexing data frames is using something called **conditional statements**. These are statements which evaluate if a certain *condition* is met, and returns data based on satisfying this condition. 
+
+Here, we'll work again with information about presidents and their favorite flowers and fruits. 
+
+To index a data frame using conditions, it is important to keep the syntax in mind. We will be adapting syntax we used before, which was:
 
 `data_frame_name[row, column]`
 
 But now, we'll be more specific. For example, what if we wanted to see all of the observations with presidents who have crocus as their favorite flower? We would do the following:
 
-```{r pres_fave3, exercise.setup = "pres_fave2", exercise = T}
+```{r pres_fave3, exercise.setup = "pres_fave_data", exercise = T}
 # select data with favorite flower as crocus
 pres_fave[pres_fave$flower == "Crocus", ]
 
@@ -488,7 +348,7 @@ Let's practice using some others.
 
 For example, what if we wanted to see all presidents with the favorite fruit banana OR apple?
 
-```{r pres_fave4, exercise.setup = "pres_fave2", exercise = T}
+```{r pres_fave4, exercise.setup = "pres_fave_data", exercise = T}
 # select data with favorite fruit as banana or apple
 pres_fave[pres_fave$fruit == "Banana" | pres_fave$fruit == "Apple", ]
 
@@ -496,7 +356,7 @@ pres_fave[pres_fave$fruit == "Banana" | pres_fave$fruit == "Apple", ]
 
 And those whose favorite flower is Allium AND favorite fruit is pear?
 
-```{r pres_fave5, exercise.setup = "pres_fave2", exercise = T}
+```{r pres_fave5, exercise.setup = "pres_fave_data", exercise = T}
 # select data with favorite flower as allium and fruit as pear
 pres_fave[pres_fave$flower == "Allium" & pres_fave$fruit == "Pear", ]
 
@@ -506,7 +366,7 @@ No one has that combination!
 
 Now, say we wanted to answer a more specific question. For all presidents whose favorite flower is Petunia, what is their favorite fruit? Here, we will both index by row AND column. We will ask R to only show us values from the fruit variable for those whose favorite flower is Petunia. 
 
-```{r pres_fave6, exercise.setup = "pres_fave2", exercise = T}
+```{r pres_fave6, exercise.setup = "pres_fave_data", exercise = T}
 # show favorite fruit for all presidents with the favorite flower Petunia
 pres_fave[pres_fave$flower == "Petunia", "fruit"]
 
@@ -515,16 +375,30 @@ pres_fave[pres_fave$flower == "Petunia", "fruit"]
 
 ### Practice 
 
-Now, we are going to create a new data frame and practice indexing with conditionals again. Now, we are going to work with additional conditional statements, such as `<` (less than) and `>` (greater than), in addition to others. Don't forget to reference the list of operators above when working! The below code will give you a framework to start working with.
+Now, we are going to work with a new data frame and practice indexing with conditionals again. We are also going to work with additional conditional statements, such as `<` (less than) and `>` (greater than), in addition to others. Don't forget to reference the list of operators above when working! The below code will give you a framework to start working with.
 
-First, you will create a new data frame, called `eu_info` with 4 variables about a selection of members of the European Union
+```{r eu_info_data, eval = T, echo = F}
 
-1. `country`: Austria, Bulgaria, Croatia, Cyprus, Denmark, Estonia, Finland
-2. `join_year`: 1995, 2007, 2013, 2004, 1973, 2004, 1995
-3. `population`: 8926000, 6916548, 4036355, 896000, 5833883, 1330068, 5527493
-4. `currency`: Euro, Lev, Euro, Euro, Krone, Euro, Euro
+eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
+                                  "Denmark", "Estonia", "Finland"),
+                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
+                      population = c(8926000, 6916548, 4036355, 896000, 5833883,
+                                    1330068, 5527493),
+                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
+                                   "Euro", "Euro"))
 
-Then, you will perform the following tasks using conditionals and indexing:
+
+```
+
+In particular, we'll be working with a data set called `eu_info`. Use `View()` below to take a look at the data:
+
+```{r eu_View, exercise = TRUE}
+
+View(eu_info)
+
+```
+
+We have four variables: `country`, `join_year` (the year the country joined the European Union), `population`, and `currency`.
 
 1. Index `eu_info` to only show observations for those who joined in the year 2007 or after
 2. Index `eu_info` to only show observations for countries that use the Euro as their currency
@@ -533,9 +407,6 @@ Then, you will perform the following tasks using conditionals and indexing:
 
 
 ```{r eu_ex, exercise = TRUE}
-
-#create data frame
-
 
 #Index task 1
 
@@ -551,40 +422,6 @@ Then, you will perform the following tasks using conditionals and indexing:
 
 ```
 ```{r eu_ex-hint-1}
-
-#create data frame
-eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
-                                  "Denmark", "Estonia", "Finland"),
-                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
-                      population: c(8926000, 6916548, 4036355, 896000, 5833883,
-                                    1330068, 5527493),
-                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
-                                   "Euro", "Euro"))
-
-# Index task 1
-
-
-#Index task 2
-
-
-#Index task 3
-
-
-#Index task 4
-
-
-```
-```{r eu_ex-hint-2}
-
-#create data frame
-eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
-                                  "Denmark", "Estonia", "Finland"),
-                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
-                      population = c(8926000, 6916548, 4036355, 896000, 5833883,
-                                    1330068, 5527493),
-                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
-                                   "Euro", "Euro"))
-
 # Index task 1
 eu_info[eu_info$join_year >= ___, ]
 
@@ -602,16 +439,7 @@ eu_info[___ | ___ | ___, ___]
 
 
 ```
-```{r eu_ex-hint-3}
-
-#create data frame
-eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
-                                  "Denmark", "Estonia", "Finland"),
-                      join_year = c(1995, 2007, 2013, 2004, 1973, 2004, 1995),
-                      population = c(8926000, 6916548, 4036355, 896000, 5833883,
-                                    1330068, 5527493),
-                      currency = c("Euro", "Lev", "Euro", "Euro", "Krone",
-                                   "Euro", "Euro"))
+```{r eu_ex-hint-2}
 
 # Index task 1
 eu_info[eu_info$join_year >= 2007, ]
@@ -633,9 +461,34 @@ eu_info[eu_info$country == "Austria" | eu_info$country == "Bulgaria" |
 ```
 
 
+## Topic 4: How Computers Store Files
+
+To fully harness the power of R for data analysis and manipulation, it's important to understand how computers store files and how R interacts with them. Armed with this knowledge, you will be able to seamlessly load data sets, analyze them, and save the results! 
+
+### The Basics
+
+Let's start with the basics. Your computer's storage system is organized into *folders*, which can contain additional folders and *files*. These files consist of collections of data, such as text, pictures, videos, and more. Each file has a unique location on your hard drive, which we can access using something called a *path*. A file path is the address that specifies the location of a file on your computer's storage system. It's like giving directions to R on where to find the data you want to work with! 
+
+Suppose we have the file data.csv located in a folder called "Documents." Let's look at how the file paths would appear on both Windows and macOS:
+
+- On Windows, the file path to data.csv would be `"C:/Users/Guest/Documents/data.csv"`.
+
+- On macOS, the file path to data.csv would be `"/Users/Guest/Documents/data.csv"`.
+
+### Checking Your Working Directory
+
+Finally, R has what's called a *working directory*. The working directory is the default location where R looks for files and saves outputs if no path is specified. You can check the current working directory in R using the `getwd()` function:
+
+```{r eval = F}
+getwd() #check the current working directory
+```
+
+Okay, before we move on to the next topic, take a moment to create a special folder to store all of your materials for this class. Having a dedicated POLI 281 folder will help keep your R scripts, data files, and any other class-related materials in one place, making them easier to manage and locate throughout the course!
+
+
 ## Topic 5: Matrices
 
-A **martix** is another 2D type of data, however matrices are not as flexible as data frames and we will not use them very often. However, they are still important to uerstand! Unlikes data frames, matrices can only handle data where every element is the same type (e.g., all numbers or all characters).
+A **martix** is another 2D type of data, however matrices are not as flexible as data frames and we will not use them very often. However, they are still important to understand! Unlike data frames, matrices can only handle data where every element is the same type (e.g., all numbers or all characters).
 
 In R, you can create a matrix using the command `matrix()` with the following syntax.
 
@@ -710,14 +563,34 @@ matrix1 #return object
 
 It is not so important for us to dive into this more right now, as we will not be relying on matrices too much in this class.
 
-## Comprehension Quiz
 
-Please complete the quiz to evaluate your comprehension using the following link:
+### Making Data Frames by Hand
 
-[Link to quiz here](https://unc.az1.qualtrics.com/jfe/form/SV_0URj5nofqDkdBEa)
+Beyond making matrices from scratch, we can also make data frames ourselves as well. Remember, data frames and matrices are both 2D data objects. However, data frames can hold different types (or classes) of data in one object, while matrices can only hold one type (e.g., all integers, or all characters).
 
-
-
+To make a data frame by hand, we will use the `data.frame()` command. The below code creates a data frame using this command. This new data frame, called `newspaper_data` contains four variables: `name` (the name of the newspaper), `n_subscribe` (the number of subscribers), and `head_q` (the location of the headquarters).
 
 
+```{r newspaper_data, exercise = TRUE}
+
+#create data frame
+newspaper_data <- data.frame(name = c("USA Today", "Wall Street Journal",
+                                      "The New York Times", "New York Post"),
+                             #first column/variable
+                             
+                             n_subscribe = c(1621091, 1011200, 483701, 426129),
+                             #second column/variable
+                             
+                             head_q = c("Virginia", "New York", "New York",
+                                        "New York")
+                             #third column/variable
+                             
+                             ) #close the command
+
+
+
+#return the data frame
+newspaper_data
+
+```
 
