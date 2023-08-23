@@ -458,15 +458,23 @@ You can see that the output is just a list of TRUEs and FALSEs – that is, it�
 
 To see how this is useful, look at the following code, which puts that set of TRUEs and FALSEs into the square brackets [] you learned in the previous Topic.
 
-
 ```{r index_vec3, exercise = TRUE, exercise.setup = "index_vec"}
+
+voters[c(T, T, F, F, F, T)]
+
+```
+
+You can see that R only returns the elements of voters where there’s a TRUE in that place. 
+
+What’s really useful is that R will let us do this all in one step, like this:
+
+```{r index_vec4, exercise = TRUE, exercise.setup = "index_vec"}
 
 voters[voters < 40]
 
 ```
 
 You can see this returned the same information as directly putting `c(T, T, F, F, F, T)` in the square brackets. 
-
 
 ### Other types of conditions
 
