@@ -17,9 +17,9 @@ data(mtcars)
 
 ## Welcome 
 
-In this tutorial, you will learn about two overarching themes. First, we'll learn about two-dimensional R objects. We will learn about two types, called **matrices** (singular: matrix) and **data frames**. We will primarily work with data frames, as they are more flexible. Second, we;ll learn about how computers store files. This will give you a foundation for understanding how to import data into R.
+In this tutorial, you will learn about two overarching themes. First, we'll learn about two-dimensional R objects. We will learn about two types, called **matrices** (singular: matrix) and **data frames**. We will primarily work with data frames, as they are more flexible. Second, we will learn about how computers store files. This will give you a foundation for understanding how to import data into R.
 
-When we discuss two-dimension R objects, we refer to them as such because they have both rows *and* columns, while before we were working with just one-dimensional data which could be described as only a row *or* a column. For example, say we have some data about cars. A one-dimensional object may have looked just like a list of the names of the cars, like this:
+When we discuss two-dimensional R objects, we refer to them as such because they have both rows *and* columns, while before we were working with just one-dimensional data which could be described as only a row *or* a column. For example, say we have some data about cars. A one-dimensional object may have looked just like a list of the names of the cars, like this:
 
 
 ```{r, echo = F, eval = T}
@@ -29,7 +29,7 @@ cars
 ```
 
 
-But now with two-dimensional data, it will take on a more complex format. For example, below we now see those five car names, and each one corresponds to a **row** in our data. Along the top, we now see names for **column** which contain additional information about each car -- or row. For instance, we see that the Mazda Rx4 has 21 miles per gallon, while the Datsun 710 has 22.8. In this class we’ll also refer to columns as “variables”, and rows as “observations”. 
+But now with two-dimensional data, it will take on a more complex format. For example, below we now see those five car names, and each one corresponds to a **row** in our data. Along the top, we now see names for each **column** which contain additional information about each car -- or row. For instance, we see that the Mazda Rx4 has 21 miles per gallon, while the Datsun 710 has 22.8. In this class we’ll also refer to columns as “variables”, and rows as “observations”. 
 
 ```{r, echo = F, eval = T}
 head(mtcars[1:5, 1:5])
@@ -54,13 +54,13 @@ mtcars
 
 ### Using a Saved Dataframe
 
-Often, we want to look at or examine a data frame you’ve saved as an object. One easy way to do this is using the `View()` command – note the capital “V”! This will open the data frame in a new tab where you can look at it. 
+Often, we want to look at or examine a data frame you’ve saved as an object. One easy way to do this is using the `head()` command! This will show you the first few rows of your data frame.
 
 
 ```{r, echo = T, eval = T}
 
-#View() data
-# View(mtcars) - doesn't work
+#Vhead() data
+head(mtcars)
 
 ```
 
@@ -74,7 +74,7 @@ mtcars$cyl
 
 This notation has a lot of other uses that you’ll learn soon. 
 
-Further, sometimes you will have a data frame with a *lot* of rows. In those cases, it may not be practice to take a look at the full object. Instead, you can use the command `head()` to just see the first few rows of the data frame. In the case of the `newspaper_data` object, we only have a few rows. But, let's use this to summarize the mtcars data, which is some built in data in R about cars (we looked at in the beginning of this tutorial):
+Further, sometimes you will have a data frame with a *lot* of rows. In those cases, it may not be practical to take a look at the full object. Instead, you can use the command `head()` to just see the first few rows of the data frame. Let's use this to summarize the mtcars data, which is some built in data in R about cars (we looked at in the beginning of this tutorial):
 
 
 ```{r, eval = T}
@@ -110,7 +110,7 @@ summary(mtcars) #summarize the data
 
 ### Practice
 
-Your turn! We're going to use what we just learned to explore a data set we have created for you, called `large_cities` which contains information about the top five largest cities in the United States. This data frame hase four variables:
+Your turn! We're going to use what we just learned to explore a data set we have created for you, called `large_cities` which contains information about the top five largest cities in the United States. This data frame has four variables:
 
 * `city`: the name of the city
 * `state`: the state where that city is located
@@ -135,15 +135,15 @@ large_cities <- data.frame(city = city,
 
 ```
 
-First, take a look at the data using the `View()` and `summary()` commands:
+First, take a look at the data using the `head()` and `summary()` commands:
 
 ```{r large_cities_ex1, exercise = TRUE, exercise.setup = "large_cities", exercise.lines = 6}
 
 
 ```
 ```{r large_cities_ex1-hint-1}
-#View
-View(large_cities)
+#head
+head(large_cities)
 
 #summary
 summary(large_cities)
@@ -265,10 +265,10 @@ pres_fave <- data.frame(president = c("Obama", "Reagan", "Carter", "Kennedy",
 1) Return only the `president` and `fruit` columns
 3) Return the 1st, 3rd, and 6th observations
 
-First, use `View()` to take a look at the data:
+First, use `head()` to take a look at the data:
 
 ```{r pres_ex1, exercise = TRUE}
-View(pres_fave)
+head(pres_fave)
 ```
 
 Great! Try just returning the second row of the data:
@@ -390,11 +390,11 @@ eu_info <- data.frame(country = c("Austria", "Bulgaria", "Croatia", "Cyprus",
 
 ```
 
-In particular, we'll be working with a data set called `eu_info`. Use `View()` below to take a look at the data:
+In particular, we'll be working with a data set called `eu_info`. Use `head()` below to take a look at the data:
 
 ```{r eu_View, exercise = TRUE}
 
-View(eu_info)
+head(eu_info)
 
 ```
 
