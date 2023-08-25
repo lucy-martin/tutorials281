@@ -32,9 +32,9 @@ In this week's class, we will continue to learn how to summarize data, calculate
 
 ## Topic 1: Recoding Variables and Handling Missing Data
 
-Up until now, we have largely been working with data frames that have complete observations. That is, there are no missing values in our data. Missing data is very common, and can happen for a variety of reasons. Sometimes data is hard to collect or might not exist! 
+Up until now, we have largely been working with data frames that have complete observations. That is, if we have a variable for age, it has the actual age for every single row of the dataset – there are no rows where the information is missing.  Missing data is very common, and can happen for a variety of reasons. Sometimes data is hard to collect or might not exist! 
 
-How do we handle this in our data? Typically, when we have a missing value, we code it as `NA` or "Not Available". R is able to recognize this type of value as a missing piece of information. However, when working with different data sets, there are a variety of conventions for coding missing values. Typically, you have access to clear documentation in which the creators of a data base will inform you how they coded, or labelled, missing values.
+How do we handle this in our data? In R, we use a special code for missing values: NA, which stands for “Not Available”. This lets R know that the information is missing. Note that NA can appear in all types of variables, even numeric ones---R treats NA as its own special code. However, when you first import a new dataset, it may use different conventions for coding missing values.  Typically, you have access to clear documentation in which the creators of a data base will inform you how they coded, or labelled, missing values.
 
 For example, it is very common for data bases to code missing values using numbers like `-99` or `-98` which are values that are very uncommon for variables to take. Let's take a look at a data set about some major wars in global history. The data set `wars_data` includes five variables:
 
@@ -103,7 +103,35 @@ war_data$war
 
 ```
 
-Nice - it looks like it worked.
+Nice - it looks like it worked. This approach of isolating and replacing certain rows with square brackets is also useful for creating a new variable. For example, consider the dataset below, where we have data on a number of wars and information on the number of casualties associated with each, the years they began and ended, and where they occurred. 
+
+```{r, eval = T}
+war_data
+```
+
+Let's say we want to create a new categorical variable that captures the severity of casualties in each war, based on `casualty_est`, the estimated number of casualties in each war. Suppose we want the following categories: "high" and "low". We can do this using square brackets as follows:
+
+```{r, eval = TRUE}
+#create empty new variable
+war_data$casualty_category <- NA
+
+# Create label for high casualties
+war_data$casualty_category[war_data$casualty_est > 7700000] <- "high"
+
+# Create label for low casualties
+war_data$casualty_category[war_data$casualty_est <= 7700000] <- "low"
+
+# Check out the updated data
+war_data
+```
+
+Let’s take a look at what that did: 
+
+1.	We started by creating a blank “placeholder” `casualty_category` variable where all the values are NA (missing). 
+2.	We then took all rows where the `casualty_est` variable was greater than 7,700,000, and replaced `casualty_category` with “high”.
+3.	We then took all rows where the `casualty_est` variable was less than or equal to 7,700,000, and replaced `casualty_category` with “low".
+
+We’ll get more practice with this in class. 
 
 ### Practice
 
@@ -114,6 +142,11 @@ Now your turn! Perform the same task as above, but now fix the "taiping rebellio
 ```
 ```{r recode_1-hint-1}
 #recode
+war_data$war[war_data$war == ""] <- ""
+
+```
+```{r recode_1-hint-2}
+#recode
 war_data$war[war_data$war == "taiping rebellion"] <- "Taiping Rebellion"
 
 #check the new value
@@ -122,7 +155,7 @@ war_data$war
 
 ## Topic 3: Factors
 
-Factors are a data type specifically designed for handling categorical data in R. Categorical variables are variables that represent data in different categories or levels. There are two main types of categorical variables: nominal and ordinal.
+So far, we’ve been working with three types of data: numeric (numbers), characters (text), and Boolean (TRUE/FALSE). This lesson introduces a new data type: Factors. Factors are a data type specifically designed for handling categorical data in R. Categorical variables are variables that represent data in different categories or levels. There are two main types of categorical variables: nominal and ordinal.
 
 1. ***Nominal*** variables have categories with no inherent order. Examples include party affiliation (e.g., Republican, Democrat, Independent) and gender (male or female).
 
@@ -130,22 +163,32 @@ Factors are a data type specifically designed for handling categorical data in R
 
 ### Using the factor() Function
 
-In R, we use the `factor()` function to create factors. Let's see how it works using party affiliation as an example:
+In R, we use the `factor()` function to create factors. We can inspect the structure of R objects using the `str()` function. Let's see how it works using party affiliation as an example:
 
 ```{r eval = T}
 party <- c("Republican", "Democrat", "Democrat", "Republican") #create a vector
-
-party.factor <- factor(party) # create a factor for party affiliation using factor()
-party.factor # inspect the resulting object
+str(party) # we see that party is currently a character variable
+summary(party) # we see that str() is more informative than summary()
 ```
 
-As you can see, `party.factor` has two levels: Democrat and Republican. We can also inspect the structure of R objects, including factors, using the `str()` function:
+```{r eval = T}
+party.factor <- factor(party) # create a factor for party affiliation using factor()
+party.factor # inspect the resulting object
+summary(party.factor) # now that we have converted party to a factor variable, summary() is more useful!
+```
+
+As you can see, `party.factor` has two values it can take, known as levels: : Democrat and Republican. 
 
 ```{r eval = T}
 str(party.factor) # inspect the structure of the factor
 ```
 
-The output shows that R recognizes party.factor as a factor with two levels: Democrat (assigned a 2) and Republican (assigned a 1). Sometimes we may want to change the order of the levels in a factor. For example, let's make Republican the first level and Democrat the second:
+The output shows that R recognizes `party.factor` as a factor with two levels: Democrat (assigned a 2) and Republican (assigned a 1).
+
+
+### Specifying Levels
+
+Sometimes we may want to change the order of the levels in a factor. For example, let's make Republican the first level and Democrat the second:
 
 ```{r eval = T}
 party.factor2 <- factor(party, levels = c("Republican", "Democrat")) # specify the levels
@@ -156,11 +199,25 @@ Great! Now `party.factor2` has Republican as the first level and Democrat as the
 
 ### Ordered Factors
 
-As noted above, party affiliation is a nominal variable. When dealing with ordinal variables, we need to create ordered factors that reflect the natural order of the categories. Let's take the example of language proficiency levels:
+As noted above, party affiliation is a nominal variable – there’s no natural order of categories like “Republican” and “Democrat”. Other variables are ordinal – this means they have a natural hierarchy. Let’s take the example of language proficiency levels: say an individual could be a beginner, intermediate, or advanced. We want R to store the variable so that it considers beginner “less than” intermediate, which is “less than” advanced. 
+
+To do this, we need to add two optional inputs to the factor() command. Say we have the vector below of language levels, and we make it into an unordered factor:
 
 ```{r eval = T}
 proficiency <- c("Advanced", "Beginner", "Intermediate", "Intermediate", "Advanced") #create a vector
-proficiency.factor <- factor(proficiency,ordered = TRUE, levels = c("Beginner", "Intermediate", "Advanced")) # create factor
+proficiency.factor <- factor(proficiency) # create factor
+str(proficiency.factor) # inspect output
+```
+
+As you can see, R puts the factors in alphabetical order, but doesn’t consider one better/worse than the other. To make it an ordered factor, we need to add two optional commands:
+
+1.	We need to specify that it’s an ordered factor by adding `ordered=T`.
+2.	We need to specify the exact order we want the levels in.
+
+The code below remakes the vector and adds the optional commands, separated by “,”. 
+
+```{r eval = T}
+proficiency.factor <- factor(proficiency,ordered = T, levels = c("Beginner", "Intermediate", "Advanced")) # create factor
 str(proficiency.factor) # inspect output
 ```
 
@@ -230,7 +287,7 @@ The important thing to note here is that *there is a typical way that the comman
 Now that we understand how optional arguments in commands work, we can move on to summarizing missing data. These two topics are related as key functions, such as `mean()`, require certain optional arguments to work with data that has missing observations.
 
 
-### Summarizing Missing Data
+### Summarizing With Missing Data
 
 Last week, we learned about using commands such as `mean()`, `min()`, and `max()` to summarize our data. Typically, each of these functions accept an argument `x` which is an object which contains multiple numbers. With these numbers, R would then calculate the mean, minimum (min), or maximum (max). For example, we calculate the mean of the following vector:
 
@@ -280,12 +337,13 @@ And check it out! We no longer see that the mean is `NA`, but rather that the me
 
 Now, you try. Using the following code below, take `vector3` and try to calculate the mean first *without* specifying that R should remove the `NA` values. Then, try telling R to remove the RAs using the `na.rm` optional argument.
 
-```{r, eval = T}
+```{meanex r, eval = T, exercise = T}
 
 vector2 <- c(1, NA, 5, 6, 9, NA, 12) #create vector with NAs
 
-min(vector2) #calculate mean and remove NAs
+mean(vector2) #calculate mean without removing NAs
 
+mean(vector2, na.rm = T) # calculate mean and remove NAs
 ```
 
 Note that we can also do this with the `max()` function. Similar options are also available in other commands that we will use in the future.
@@ -323,7 +381,7 @@ votes
 
 Nice! It worked. Notice that after the `<-` operator, we have to call each variable within its data set. For example, we cannot write `vote_total - (vote_dem + vote_rep)`, but rather we must write `votes$vote_total - (votes$vote_dem + votes$vote_rep)`. You must be very specific with R to tell it from which dataset which are pulling those variables.
 
-For example, let's check out the below error which results from only telling R to subtraction `vote_dem` and `vote_rep` from `vote_total` without specifying our data set.
+For example, let's check out the below error which results from only telling R to subtract `vote_dem` and `vote_rep` from `vote_total` without specifying our data set.
 
 ```{r, eval = T, error = T}
 
@@ -337,7 +395,7 @@ It states that the first object it encounters, `vote_total`, is not found. That 
 
 Now you try! Imagine we want a new variable which captures the *percent* of all voters who voted for the Democratic candidate. We will call this new variable `dem_perc`. 
 
-To calculate this value, you will need to divide the number of votes for the Democratic candidate by number of total votes. You will then divide that quotient (the value resulting from that division) by 100.
+To calculate this value, you will need to divide the number of votes for the Democratic candidate by the number of total votes. You will then multiply that quotient (the value resulting from that division) by 100.
 
 
 ```{r dem_perc, exercise = TRUE, exercise.lines=5}
@@ -368,73 +426,41 @@ votes
 ```
 
 
-## Topic 6: Using `ifelse()`
+## Topic 6 (Optional): Using `ifelse()`
 
-In addition to creating new variables using the strategy we just learned, we can also do so with a very useful function called `ifelse()`. This function is a nice alternative to recoding or creating new variables with `[]` at times. For example,
-let's say we want to create a new categorical variable in our data set which captures if a town is considered to be a "large" or "small" district based on the total amount of voters it had that year. We can do that using square brackets in the following way:
-
-
-```{r, eval = TRUE}
-#create empty new variable
-votes$district_size <- NA
-
-#create label for large
-votes$district_size[votes$vote_total > 500000] <- "large"
-
-#create label for small
-votes$district_size[votes$vote_total <= 500000] <- "small"
-
-#check out data
-votes
-
-```
-
-With `ifelse()`, we can do this in one line of code. See below:
-
-```{r}
-#create new variable with ifelse()
-votes$town_size <- ifelse(votes$vote_total > 500000, "large", "small")
-
-#check out data
-votes
-
-```
-
-Great, definitely saved us some space! But how does the `ifelse()` command work? 
+In addition to creating new variables using the tools learned in previous topics, we can also do so with a very useful function called `ifelse()`. This function is a nice alternative to re-coding or creating new variables with `[]` at times. But how does the `ifelse()` command work? 
 
 To start, it is important to understand that the `ifelse` command accepts three necessary arguments. We can approach each of these arguments as an essential step in writing out the function. See the figure below:
 
 <iframe src="https://drive.google.com/file/d/1e6VFpbY8xCDBY0a69YB7WLg4O_OTyafE/preview" width="635" height="340" allow="autoplay"></iframe>
 
-**Step 1:** First, the `test` argument is a logical statement which the function evaluates. In the past example, we were interested in labeling towns in our `votes` data set as large voting districts if they had a total number of votes greater than 500 thousand. We would begin with the following:
+**Step 1:** First, the `test` argument is a logical statement which the function evaluates. Remember our earlier example where we wanted to label wars in our `wars_data' dataset as high severity if the number of casualties was greater than 7,700,000? We would begin with the following:
 
-`ifelse(votes$vote_total > 500000, yes, no)`
+`ifelse(war_data$casualty_est > 7700000, "high", "low")`
 
-In the above statement, we are asking the `ifelse()` command to evaluate a logical statement `votes$vote_total > 500000`. It evaluates each observation for the `vote_total` variable to determine if `votes$vote_total > 500000` == `TRUE` or `FALSE`. This is the **if** part of the statement!
+In the above statement, we are asking the `ifelse()` command to evaluate a logical statement `war_data$casualty_est > 7700000`. It evaluates each observation for the `casualty_est` variable to determine if `war_data$casualty_est > 7700000` == `TRUE` or `FALSE`. This is the **if** part of the statement!
 
-**Step 2:** Let's move on to the `else` portion. We start with the `yes` argument. This specifies what the command should do if `votes$vote_total > 500000 == TRUE` or if the condition is met. In this case, we may want the command to return the statement `large` to indicate that the voting district is large. So we would write the following:
+**Step 2:** Let's move on to the `else` portion. We start with the `yes` argument. This specifies what the command should do if `war_data$casualty_est > 7700000 == TRUE` or if the condition is met. In this case, we may want the command to return the statement `high` to indicate that the war was high severity in terms of casualties. So we would write the following:
 
-`ifelse(votes$vote_total > 500000, "large", no)`
+`ifelse(war_data$casualty_est > 7700000, "high", no)`
 
-**Step 3:** We now have one argument left, the `no` argument. This argument is reserved for what we would like the command to do if the condition is `FALSE`, or if it not `TRUE` (no). In this case, we will tell `ifelse()` to label these towns as representing "small" districts, and would write the following:
+**Step 3:** We now have one argument left, the `no` argument. This argument is reserved for what we would like the command to do if the condition is `FALSE`, or if it not `TRUE` (no). In this case, we will tell `ifelse()` to label these wars as "low" severity in terms of the number of casualties, and would write the following:
 
-
-`ifelse(votes$population > 500000, "large", "small")`
+`ifelse(war_data$casualty_est > 7700000, "high", "low")`
 
 Great! We have the `ifelse()` command written. But, where are we feeding this information to? We should save the resulting information into an object, as in the figure below:
 
 <iframe src="https://drive.google.com/file/d/1GFsT0u6zvfuSX96_el-wsU3Vnocu8l7V/preview" width="700" height="320" allow="autoplay"></iframe>
 
-Now, in the case of this example, this is where variable creation comes in. We can save the resulting information into a new variable. For our `object` of interest we will create a new variable called `district_size`. We would then do the following:
+Now, in the case of this example, this is where variable creation comes in. We can save the resulting information into a new variable. For our `object` of interest we will create a new variable called `casualty_category`. We would then do the following:
 
 ```{r, eval = T}
 
-#create new variable using ifelse()
-votes$district_size <- ifelse(votes$vote_total > 500000, "large", "small")
+# create the new casualty_category variable using ifelse
+war_data$casualty_category <- ifelse(war_data$casualty_est > 7700000, "high", "low")
 
-#check out the new variable in the data set
-votes
-
+# check out the new variable in the dataset
+war_data
 ```
 
 
@@ -442,13 +468,13 @@ Note that above, we again have to save the information into a new variable which
 
 ### Practice
 
-Your turn to try! Below, create a variable called `maj_dem` which is "Yes" if the majority of the citizens voted for the Democratic candidate, and "No" if not. To calculate this value, you will need to determine if the quotient of `vote_dem` / `vote_total` is greater than 0.5. We have provided some code below to help you get started.
+Your turn to try! Below, create a variable called `short_wars` which is "Yes" if the war lasted more than two years, and "No" if not. To calculate this value, you will need to subtract `start_year` from `end_year`. We have provided some code below to help you get started.
 
 
-```{r maj_dem, exercise = TRUE, exercise.lines = 7}
+```{r short_war, exercise = TRUE, exercise.lines = 7}
 
 #ifelse() statement
-votes$___ <- ifelse(___/___ CONDITION ___, ___, ___)
+war_data$___ <- ifelse(_____ - ____ CONDITION ___, "____", "____")
 
 #check out the data set
 
@@ -456,24 +482,24 @@ votes$___ <- ifelse(___/___ CONDITION ___, ___, ___)
 
 
 ```
-```{r maj_dem-hint-1}
+```{r short_war-hint-1}
 
 #ifelse() statement
-votes$maj_dem <- ifelse(votes$vote_dem/votes$vote_total CONDITION 0.5, ___, ___)
+war_data$duration_category <- ifelse(war_data$end_year - war_data$start_year CONDITION 2, "___", "___")
 
 #check out the data set
-votes
+war_data
 
 
 
 ```
-```{r maj_dem-hint-2}
+```{r short_war-hint-2}
 
 #ifelse() statement
-votes$maj_dem <- ifelse(votes$vote_dem/votes$vote_total > 0.5, "Yes", "No")
+war_data$duration_category <- ifelse(war_data$end_year - war_data$start_year <= 2, "Short", "Long")
 
 #check out the data set
-votes
+war_data
 
 ```
 
@@ -481,34 +507,26 @@ votes
 
 Note that we can also make `ifelse()` statements more complicated by chaining them together. We will learn more about this in class, but the below example will begin to get you acquainted with this idea.
 
-Let's revisit our first `ifelse()` statement where we created two labels for towns and how big of a voting district they each represent -- large and small. What would we do if we wanted to have three labels (large, medium, and small)? To do this, we would have to embed an `ifelse()` statement into another.
+Let's go back to our first `ifelse()` statement, where we created two labels for how severe the wars were in terms of casualties. What would we do if we wanted to have three labels (low, medium, and high)? To do this, we would have to embed an `ifelse()` statement into another.
 
 
 
 ```{r, eval = T}
 
 #create new variable using ifelse()
-votes$district_size <- ifelse(votes$vote_total > 800000, "large",
-                          ifelse(votes$vote_total < 800000 &
-                                   votes$vote_total > 600000, "medium",
-                                 "small"))
+war_data$casualty_category <- ifelse(war_data$casualty_est > 21075000, "high",
+                            ifelse(war_data$casualty_est > 7700000 & war_data$casualty_est <= 21075000, "medium",
+                                   "low"))
 
 #check out the new variable in the data set
-votes
+war_data
 
 ```
 
 
-Let's break down the above code to understand it a bit more. First, we tell R to return "large" if `votes$vote_total > 800000`. But after this condition, in the "no" position of the `ifelse()` statement, we now place another `ifelse()`. We are telling R that if this condition is NOT met, let's move on to another set of conditions. 
+Let's break down the above code to understand it a bit more. First, we tell R to return "high" if `war_data$casualty_est > 21075000`. But after this condition, in the "no" position of the `ifelse()` statement, we now place another `ifelse()`. We are telling R that if this condition is NOT met, let's move on to another set of conditions. 
 
-Next we tell R to return the value "medium" if `votes$vote_total < 800000 & votes$vote_total > 600000` or if the town is BOTH smaller than 800 thousand and larger than 600 thousand. Following that, for all other instances (which would be smaller than 600000), we tell R to return "small".
-
-
-## Comprehension Quiz
-
-Please complete the quiz to evaluate your comprehension using the following link:
-
-[Link to quiz here](https://unc.az1.qualtrics.com/jfe/form/SV_cN1ZItiB76g3Yge)
+Next we tell R to return the value "medium" if `war_data$casualty_est > 7700000 & war_data$casualty_est <= 21075000` or if the number of casualties is both greater than 7700000 and less than or equal to 21075000. Following that, for all other instances (which would be less than 7700000), we tell R to return "low".
 
 
 
