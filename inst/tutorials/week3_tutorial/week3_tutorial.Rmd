@@ -211,8 +211,13 @@ Beyond indexing by column or row **number**, we can also do so by the name of co
 large_cities[ ,"population"]
 ```
 
-We can also do so for multiple columns, like both `city` and `mayor`. To do so, we would put both of these columns into a `c()` command, and place them within the `[]`, like so: 
+Often, the easiest way to index a single variable is to use the `$` notation. We can do this as follows:
 
+```{r indexing4pt2, exercise = TRUE, exercise.setup = "large_cities"}
+large_cities$population
+```
+
+We can also use the earlier approach for multiple columns, like both `city` and `mayor`. To do so, we would put both of these columns into a `c()` command, and place them within the `[]`, like so: 
 
 ```{r indexing5, exercise = TRUE, exercise.setup = "large_cities"}
 
@@ -447,4 +452,3 @@ newspaper_data <- data.frame(name = c("USA Today", "Wall Street Journal",
 newspaper_data
 
 ```
-
