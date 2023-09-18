@@ -28,56 +28,11 @@ votes <- data.frame(vote_total = c(988000, 789999, 476222, 896123),
 
 ## Welcome
 
-In this week's class, we will continue to learn how to summarize data, calculate some descriptive statistics, learn how to recode variables when necessary, and create a new variable. In Part A, we will focus on recoding variables and missing data. Please continue to Part B when you complete this tutorial. 
+Last week we introduced dataframes and started to learn how to summarize them. Critically, we only worked with variables that already had all the information we needed. In this week's class, we will continue to learn how to summarize data. But, we will be working with datasets that may have missing values for some variables, or where we need to "clean" the dataset to get the variables we want to analyze. We will also introduce a new type of variable: factors.
 
-## Topic 1: Recoding Variables and Handling Missing Data
+## Topic 1: Recoding Parts of a Variable
 
-Up until now, we have largely been working with data frames that have complete observations. That is, if we have a variable for age, it has the actual age for every single row of the dataset – there are no rows where the information is missing.  Missing data is very common, and can happen for a variety of reasons. Sometimes data is hard to collect or might not exist! 
-
-How do we handle this in our data? In R, we use a special code for missing values: NA, which stands for “Not Available”. This lets R know that the information is missing. Note that NA can appear in all types of variables, even numeric ones---R treats NA as its own special code. However, when you first import a new dataset, it may use different conventions for coding missing values.  Typically, you have access to clear documentation in which the creators of a data base will inform you how they coded, or labelled, missing values.
-
-For example, it is very common for data bases to code missing values using numbers like `-99` or `-98` which are values that are very uncommon for variables to take. Let's take a look at a data set about some major wars in global history. The data set `wars_data` includes five variables:
-
--   `war`: the title of the conflict
--   `casualty_est`: a lower estimate of the total number of casualties
--   `start_year`: the year the conflict began
--   `end_year`: the year the conflict ended
--   `location`: where the conflict occurred
-
-```{r, echo = T, eval = T}
-
-summary(war_data) #summarize data
-
-
-head(war_data) #view first few observations
-```
-
-When we take a look at this data, something stands out! What seems off about the `casualty_est` variable?
-
-Well, these variables occasionally take on the value `-99` which seems to be an uncommon value and is not a number that corresponds to a true number of causalities. We take a look at the codebook, and we see that the researchers specified that `-99` here signifies a missing value. So now we need to handle this.
-
-If you recall from previous weeks, we can recode some part of a variable using square brackets, or `[]`. We can use this same strategy to recode `NA` values. In this case, we know we are interested in all of the cases where, for example, `casualty_est` is equal to `-99`. So, we would first index our data as such to identify these observations. It would look like this:
-
-```{r}
-war_data$casualty_est[war_data$casualty_est == -99]
-```
-
-The above line of code identifies all observations for the variable `casualty_est` within our `war_data` data set where `casualty_est == -99`. With this, we can then assign a new value to those observations. Instead of `-99`, we want these variables to have the value `NA`. We would do that like this:
-
-```{r, eval = TRUE}
-#recode variable
-war_data$casualty_est[war_data$casualty_est == -99] <- NA
-
-#summarize the variable to make sure it worked
-summary(war_data$casualty_est)
-```
-In the summary of the `casualty_est` variable, you can now see that the minimum value is no longer `-99`, but instead is `900000`. Further, R is now reporting that there are 3 `NA` values.
-
-## Topic 2: Recoding Non-Missing Values
-
-In addition to recoding `NA` values within our data, we can use the same strategy to recode variables to become other variables. This is helpful, for example, if we encounter an observation that may have an incorrect value
-
-For example, let's take a look at the variable `war` with all of the titles of the conflicts in the data set.
+Sometimes, our dataset might have errors that we need to fix before we do analysis. For example, let's take a look at the variable `war` with all of the titles of the conflicts in the data set.
 
 ```{r, eval = T}
 war_data$war
@@ -85,7 +40,7 @@ war_data$war
 
 While most of the wars use fully capitalized titles, we seem to have a few that do not. In particular, it seems that World War II has lower case w's, as does the Taiping Rebellion, and the Hundred Years' War. Let's fix these so they all are properly capitalized.
 
-Let's start with World War II. How would we just isolate that observation within our data set?
+Let’s start with changing “world war II” to “World War II”. To do this, we need to 1) subset to just the rows of `war_data$war` that are equal to “world war II” and then 2) redefine those cells to be capitalized. We already know how to subset to just those rows, namely
 
 
 ```{r, eval = T}
@@ -103,35 +58,7 @@ war_data$war
 
 ```
 
-Nice - it looks like it worked. This approach of isolating and replacing certain rows with square brackets is also useful for creating a new variable. For example, consider the dataset below, where we have data on a number of wars and information on the number of casualties associated with each, the years they began and ended, and where they occurred. 
-
-```{r, eval = T}
-war_data
-```
-
-Let's say we want to create a new categorical variable that captures the severity of casualties in each war, based on `casualty_est`, the estimated number of casualties in each war. Suppose we want the following categories: "high" and "low". We can do this using square brackets as follows:
-
-```{r, eval = TRUE}
-#create empty new variable
-war_data$casualty_category <- NA
-
-# Create label for high casualties
-war_data$casualty_category[war_data$casualty_est > 7700000] <- "high"
-
-# Create label for low casualties
-war_data$casualty_category[war_data$casualty_est <= 7700000] <- "low"
-
-# Check out the updated data
-war_data
-```
-
-Let’s take a look at what that did: 
-
-1.	We started by creating a blank “placeholder” `casualty_category` variable where all the values are NA (missing). 
-2.	We then took all rows where the `casualty_est` variable was greater than 7,700,000, and replaced `casualty_category` with “high”.
-3.	We then took all rows where the `casualty_est` variable was less than or equal to 7,700,000, and replaced `casualty_category` with “low".
-
-We’ll get more practice with this in class. 
+Nice, it worked!
 
 ### Practice
 
@@ -153,85 +80,60 @@ war_data$war[war_data$war == "taiping rebellion"] <- "Taiping Rebellion"
 war_data$war
 ```
 
-## Topic 3: Factors
+## Topic 2: Introducing: Missing Data
 
-So far, we’ve been working with three types of data: numeric (numbers), characters (text), and Boolean (TRUE/FALSE). This lesson introduces a new data type: Factors. Factors are a data type specifically designed for handling categorical data in R. Categorical variables are variables that represent data in different categories or levels. There are two main types of categorical variables: nominal and ordinal.
+Up until now, we have largely been working with data frames that have complete observations. That is, if we have a variable for age, it has the actual age for every single row of the dataset – there are no rows where the information is missing.  Missing data is very common, and can happen for a variety of reasons. Sometimes data is hard to collect or might not exist! 
 
-1. ***Nominal*** variables have categories with no inherent order. Examples include party affiliation (e.g., Republican, Democrat, Independent) and gender (male or female).
+How do we handle this in our data? In R, we use a special code for missing values: `NA`, which stands for “Not Available”. This lets R know that the information is missing. Note that `NA` can appear in all types of variables, even numeric ones---R treats `NA` as its own special code. However, when you first import a new dataset, it may use different conventions for coding missing values.  Typically, you have access to clear documentation in which the creators of a data base will inform you how they coded, or labelled, missing values.
 
-2. ***Ordinal*** variables have categories with a natural ranking or order. For example, language proficiency levels may be classified as Beginner, Intermediate, and Advanced.
+For example, it is very common for data bases to code missing values using numbers like `-99` or `-98` which are values that are very uncommon for variables to take. Let's take a look at a data set about some major wars in global history. The data set `wars_data` includes five variables:
 
-### Using the factor() Function
+-   `war`: the title of the conflict
+-   `casualty_est`: a lower estimate of the total number of casualties
+-   `start_year`: the year the conflict began
+-   `end_year`: the year the conflict ended
+-   `location`: where the conflict occurred
 
-In R, we use the `factor()` function to create factors. We can inspect the structure of R objects using the `str()` function. Let's see how it works using party affiliation as an example:
+```{r, echo = T, eval = T}
 
-```{r eval = T}
-party <- c("Republican", "Democrat", "Democrat", "Republican") #create a vector
-str(party) # we see that party is currently a character variable
-summary(party) # we see that str() is more informative than summary()
+summary(war_data) #summarize data
+
+
+head(war_data) #view first few observations
 ```
 
-```{r eval = T}
-party.factor <- factor(party) # create a factor for party affiliation using factor()
-party.factor # inspect the resulting object
-summary(party.factor) # now that we have converted party to a factor variable, summary() is more useful!
+When we take a look at this data, something stands out! What seems off about the `casualty_est` variable?
+
+Well, this variable occasionally takes on the value `-99` which seems to be an uncommon value and is not a number that corresponds to a true number of causalities. We take a look at the codebook, and we see that the researchers specified that `-99` here signifies a missing value. So now we need to handle this.
+
+If you recall from the previous topic, we can recode some part of a variable using square brackets, or `[]`. We can use this same strategy to recode `NA` values. In this case, we know we are interested in all of the cases where, for example, `casualty_est` is equal to `-99`. So, we would first index our data as such to identify these observations. It would look like this:
+
+```{r}
+war_data$casualty_est[war_data$casualty_est == -99]
 ```
 
-As you can see, `party.factor` has two values it can take, known as levels: : Democrat and Republican. 
+The above line of code identifies all observations for the variable `casualty_est` within our `war_data` data set where `casualty_est == -99`. With this, we can then assign a new value to those observations. Instead of `-99`, we want these variables to have the value `NA`. We would do that like this:
 
-```{r eval = T}
-str(party.factor) # inspect the structure of the factor
+```{r, eval = TRUE}
+#recode variable
+war_data$casualty_est[war_data$casualty_est == -99] <- NA
+
+#summarize the variable to make sure it worked
+summary(war_data$casualty_est)
 ```
+In the summary of the `casualty_est` variable, you can now see that the minimum value is no longer `-99`, but instead is `900000`. Further, R is now reporting that there are 3 `NA` values.
 
-The output shows that R recognizes `party.factor` as a factor with two levels: Democrat (assigned a 2) and Republican (assigned a 1).
+Remember that `NA` is a special value in R. For it to work you must capitalize both letters. You should also never put quotes around `NA`.
 
+## Topic 3: Summarizing with Missing Data
 
-### Specifying Levels
-
-Sometimes we may want to change the order of the levels in a factor. For example, let's make Republican the first level and Democrat the second:
-
-```{r eval = T}
-party.factor2 <- factor(party, levels = c("Republican", "Democrat")) # specify the levels
-str(party.factor2) # inspect output 
-```
-
-Great! Now `party.factor2` has Republican as the first level and Democrat as the second level. 
-
-### Ordered Factors
-
-As noted above, party affiliation is a nominal variable – there’s no natural order of categories like “Republican” and “Democrat”. Other variables are ordinal – this means they have a natural hierarchy. Let’s take the example of language proficiency levels: say an individual could be a beginner, intermediate, or advanced. We want R to store the variable so that it considers beginner “less than” intermediate, which is “less than” advanced. 
-
-To do this, we need to add two optional inputs to the factor() command. Say we have the vector below of language levels, and we make it into an unordered factor:
-
-```{r eval = T}
-proficiency <- c("Advanced", "Beginner", "Intermediate", "Intermediate", "Advanced") #create a vector
-proficiency.factor <- factor(proficiency) # create factor
-str(proficiency.factor) # inspect output
-```
-
-As you can see, R puts the factors in alphabetical order, but doesn’t consider one better/worse than the other. To make it an ordered factor, we need to add two optional commands:
-
-1.	We need to specify that it’s an ordered factor by adding `ordered=T`.
-2.	We need to specify the exact order we want the levels in.
-
-The code below remakes the vector and adds the optional commands, separated by “,”. 
-
-```{r eval = T}
-proficiency.factor <- factor(proficiency,ordered = T, levels = c("Beginner", "Intermediate", "Advanced")) # create factor
-str(proficiency.factor) # inspect output
-```
-
-As you can see, R identifies `proficiency.factor` as an ordered factor with three levels: Beginner, Intermediate, and Advanced.
-
-## Topic 4: Summarizing with Missing Data
-
-Missing observations can affect how we summarize our data. Thankfully, many of the essential commands we use to summarize data -- like `mean()` -- take **arguments** which can help circumvent these issues. Some of these are **optional arguments**. Before diving into the specifics, and understanding how we can summarize our data even with missing values, we first need to learn about these **optional arguments**
+Missing observations can affect how we summarize our data. Many of the essential commands we use to summarize data – like `mean()` – can work even when we have missing data. But, we will have to slightly alter the way we use them. In particular, many commands take something call **optional arguments**. Before diving into the specifics of understanding how to summarize data with missing values, we first need to learn about these **optional arguments**.
 
 ### Optional Arguments in Commands
 
-Remember from earlier in the class that **commands** (sometimes called **functions**) are directives or orders that you can give to R to perform a task. Thus far, we have used a variety of commands, such as `c()`, `mean()`, and `data.frame()`. 
+Remember from earlier in the class that **commands** (sometimes called **functions**) are directives or orders that you can give to R to perform a task. Thus far, we have used a variety of commands, such as `c()`, `mean()`, and `subset()`.
 
-Every command accepts **arguments** or an input that is placed inside the `()`. So far, we have only worked with *required* arguments, or those that are absolutely essential for a function to work. For example, if we want to know the minimum value of a vector, we use the funciton `min()`. To do so, we have to give the `min()` function data:
+Every command accepts **arguments** or an input that is placed inside the `()`. So far, we have only worked with *required* arguments, or those that are absolutely essential for a function to work. For example, if we want to know the minimum value of a vector, we use the function `min()`. To do so, we have to give the `min()` function data:
 
 ```{r, eval = T}
 
@@ -286,7 +188,6 @@ The important thing to note here is that *there is a typical way that the comman
 
 Now that we understand how optional arguments in commands work, we can move on to summarizing missing data. These two topics are related as key functions, such as `mean()`, require certain optional arguments to work with data that has missing observations.
 
-
 ### Summarizing With Missing Data
 
 Last week, we learned about using commands such as `mean()`, `min()`, and `max()` to summarize our data. Typically, each of these functions accept an argument `x` which is an object which contains multiple numbers. With these numbers, R would then calculate the mean, minimum (min), or maximum (max). For example, we calculate the mean of the following vector:
@@ -335,43 +236,75 @@ mean(vector2, na.rm = T) #calculate mean and remove NAs
 And check it out! We no longer see that the mean is `NA`, but rather that the mean is 6.6. Specifying that the `mean()` function should then ignore all `NA` values when calculating the mean helped us with this issue!
 
 
-Now, you try. Using the following code below, take `vector3` and try to calculate the mean first *without* specifying that R should remove the `NA` values. Then, try telling R to remove the RAs using the `na.rm` optional argument.
+Now, you try. Using the following code below, take `vector2` and try to calculate the mean first *without* specifying that R should remove the `NA` values. Then, try telling R to remove the RAs using the `na.rm` optional argument.
 
-```{meanex r, eval = T, exercise = T}
+```{r meanex, exercise = TRUE}
 
+```
+```{r meanex-hint-1}
+# create vector with NAs
+vector2 <- c(__, NA, __, __, __, NA, __) #create vector with NAs
+
+#calculate mean without removing NAs
+mean(____)
+
+#calculate mean and remove NAs
+mean(___, na.rm = ___)
+```
+```{r meanex-hint-2}
+# create vector with NAs
 vector2 <- c(1, NA, 5, 6, 9, NA, 12) #create vector with NAs
 
-mean(vector2) #calculate mean without removing NAs
+#calculate mean without removing NAs
+mean(vector2)
 
-mean(vector2, na.rm = T) # calculate mean and remove NAs
+#calculate mean and remove NAs
+mean(vector2, na.rm = TRUE)
 ```
+
 
 Note that we can also do this with the `max()` function. Similar options are also available in other commands that we will use in the future.
 
-
-
-
-## Topic 5: Creating a New Variable
+## Topic 4: Creating New Variables, Part 1
 
 In addition to recoding variables, we often want to create new variables in an existing data set. For example, let's examine a dataset which has some hypothetical information about three towns in the U.S.
 
 
 ```{r, eval = T}
 
-summary(votes)
+head(votes)
 
 ```
 
-This dataset has three variables: `town` which is a label for each town (A thru D), `vote_total` which gives us a count of all those who voted, `vote_dem` which gives us a count of how many people in the town voted for a Democrat, and `vote_rep` which gives us a count of how many people in the town voted for a Republican in a recent gubernatorial election. 
+This dataset has four variables: `town` which is a label for each town (A thru D), `vote_total` which gives us a count of all those who voted, `vote_dem` which gives us a count of how many people in the town voted for a Democrat, and `vote_rep` which gives us a count of how many people in the town voted for a Republican in a recent gubernatorial election.
 
-Now, although we have information about how many individuals voted for the Democrat and Republican candidate, it may also be useful for us to have in our data set how many people did *not* vote for either (that is, they voted for a third candidate - an independent). The below chunk of code creates a new variable which captures that. It is called `vote_ind`. 
+Now, although we have information about how many individuals voted for the Democrat and Republican candidate, it may also be useful for us to have in our data set how many people did not vote for either (that is, they voted for a third-party or independent candidate). To do this, we will want to make a new variable called `vote_other`. 
 
-It does so by subtracting the total number of votes for the Democratic and Republican candidates from the total vote.
+One way to make a new variable in R is very similar to the examples of “math using vectors” that we saw in week two. Recall that if we have 
+
+```{r, eval = T}
+vec1 <- c(1, 3, 5)
+vec2 <- c(2, 4, 6)
+```
+
+We can create a new vector that adds `vec1+vec2`, like so:
+
+```{r, eval = T}
+vec3 <- vec1+vec2
+```
+
+We can do something similar here. Generally, to add a new variable to a dataset, we can use the following syntax:
+
+```{r, eval = FALSE}
+dataframe$new var <- [INSTRUCTIONS FOR CREATING NEW VARIABLE]
+```
+
+In this particular case, we will need to figure out how exactly to use existing variables to create the new variable we need. To find the number of independent/third-party votes for each city, we will need to take the number of total votes, and subtract the number of Republican and Democrat votes. The below chunk of code does just that: it tells `R` to make a new variable called `vote_other`, and tells `R` how to use the `vote_total`, `vote_dem`, and `vote_rep` variables to get the answer we want. 
 
 ```{r, eval = T}
 
 #create variable
-votes$vote_ind <- votes$vote_total - (votes$vote_dem + votes$vote_rep)
+votes$vote_other <- votes$vote_total - (votes$vote_dem + votes$vote_rep)
 
 #check out the data
 votes
@@ -426,107 +359,151 @@ votes
 ```
 
 
-## Topic 6 (Optional): Using `ifelse()`
+## Topic 5: Creating New Variables, Part 2
 
-In addition to creating new variables using the tools learned in previous topics, we can also do so with a very useful function called `ifelse()`. This function is a nice alternative to re-coding or creating new variables with `[]` at times. But how does the `ifelse()` command work? 
-
-To start, it is important to understand that the `ifelse` command accepts three necessary arguments. We can approach each of these arguments as an essential step in writing out the function. See the figure below:
-
-<iframe src="https://drive.google.com/file/d/1e6VFpbY8xCDBY0a69YB7WLg4O_OTyafE/preview" width="635" height="340" allow="autoplay"></iframe>
-
-**Step 1:** First, the `test` argument is a logical statement which the function evaluates. Remember our earlier example where we wanted to label wars in our `wars_data' dataset as high severity if the number of casualties was greater than 7,700,000? We would begin with the following:
-
-`ifelse(war_data$casualty_est > 7700000, "high", "low")`
-
-In the above statement, we are asking the `ifelse()` command to evaluate a logical statement `war_data$casualty_est > 7700000`. It evaluates each observation for the `casualty_est` variable to determine if `war_data$casualty_est > 7700000` == `TRUE` or `FALSE`. This is the **if** part of the statement!
-
-**Step 2:** Let's move on to the `else` portion. We start with the `yes` argument. This specifies what the command should do if `war_data$casualty_est > 7700000 == TRUE` or if the condition is met. In this case, we may want the command to return the statement `high` to indicate that the war was high severity in terms of casualties. So we would write the following:
-
-`ifelse(war_data$casualty_est > 7700000, "high", no)`
-
-**Step 3:** We now have one argument left, the `no` argument. This argument is reserved for what we would like the command to do if the condition is `FALSE`, or if it not `TRUE` (no). In this case, we will tell `ifelse()` to label these wars as "low" severity in terms of the number of casualties, and would write the following:
-
-`ifelse(war_data$casualty_est > 7700000, "high", "low")`
-
-Great! We have the `ifelse()` command written. But, where are we feeding this information to? We should save the resulting information into an object, as in the figure below:
-
-<iframe src="https://drive.google.com/file/d/1GFsT0u6zvfuSX96_el-wsU3Vnocu8l7V/preview" width="700" height="320" allow="autoplay"></iframe>
-
-Now, in the case of this example, this is where variable creation comes in. We can save the resulting information into a new variable. For our `object` of interest we will create a new variable called `casualty_category`. We would then do the following:
+Sometimes we can’t just use math to make a new variable. For example, let’s go back to the dataset on wars we saw earlier:
 
 ```{r, eval = T}
-
-# create the new casualty_category variable using ifelse
-war_data$casualty_category <- ifelse(war_data$casualty_est > 7700000, "high", "low")
-
-# check out the new variable in the dataset
-war_data
+head(war_data)
 ```
 
+Let’s say we want to create a new categorical variable that captures the severity of casualties in each war, based on `casualty_est`, the estimated number of casualties in each war. Suppose we want to classify the number of casualties as “high” or “low” depending on whether there were at least 10 million casualties. In particular, we want a new character variable that says “high” for any wars with at least 10 million casualties, and “low” for any variable with fewer than 10 million casualties.
 
-Note that above, we again have to save the information into a new variable which we attach to the data set using the `$` operator. 
+We can do this as follows:
 
-### Practice
+Step 1: Make a new variable called “casualty_category” and set it equal to `NA` for all rows.
 
-Your turn to try! Below, create a variable called `short_wars` which is "Yes" if the war lasted more than two years, and "No" if not. To calculate this value, you will need to subtract `start_year` from `end_year`. We have provided some code below to help you get started.
+Step 2: Select just the rows where the war had <10 million casualties, and recode our new variable to say “low” instead of `NA`. 
 
+Step 3: Select just the rows where the war had more than 10 million casualties, and recode our new variable to say “high” instead of `NA`.
 
-```{r short_war, exercise = TRUE, exercise.lines = 7}
-
-#ifelse() statement
-war_data$___ <- ifelse(_____ - ____ CONDITION ___, "____", "____")
-
-#check out the data set
-
-
-
-
-```
-```{r short_war-hint-1}
-
-#ifelse() statement
-war_data$duration_category <- ifelse(war_data$end_year - war_data$start_year CONDITION 2, "___", "___")
-
-#check out the data set
-war_data
-
-
-
-```
-```{r short_war-hint-2}
-
-#ifelse() statement
-war_data$duration_category <- ifelse(war_data$end_year - war_data$start_year <= 2, "Short", "Long")
-
-#check out the data set
-war_data
-
-```
-
-### Chaining together `ifelse()` statements
-
-Note that we can also make `ifelse()` statements more complicated by chaining them together. We will learn more about this in class, but the below example will begin to get you acquainted with this idea.
-
-Let's go back to our first `ifelse()` statement, where we created two labels for how severe the wars were in terms of casualties. What would we do if we wanted to have three labels (low, medium, and high)? To do this, we would have to embed an `ifelse()` statement into another.
-
-
+The code below does just that: 
 
 ```{r, eval = T}
+#create empty new variable
+war_data$casualty_category <- NA
 
-#create new variable using ifelse()
-war_data$casualty_category <- ifelse(war_data$casualty_est > 21075000, "high",
-                            ifelse(war_data$casualty_est > 7700000 & war_data$casualty_est <= 21075000, "medium",
-                                   "low"))
+# Create label for high casualties
+war_data$casualty_category[war_data$casualty_est > 10000000] <- "high"
 
-#check out the new variable in the data set
+# Create label for low casualties
+war_data$casualty_category[war_data$casualty_est <= 10000000] <- "low"
+
+# Check out the updated data
 war_data
-
 ```
 
+Let’s take a look at what that did:
 
-Let's break down the above code to understand it a bit more. First, we tell R to return "high" if `war_data$casualty_est > 21075000`. But after this condition, in the "no" position of the `ifelse()` statement, we now place another `ifelse()`. We are telling R that if this condition is NOT met, let's move on to another set of conditions. 
+1.	We started by creating a blank “placeholder” `casualty_category` variable where all the values are NA (missing).
 
-Next we tell R to return the value "medium" if `war_data$casualty_est > 7700000 & war_data$casualty_est <= 21075000` or if the number of casualties is both greater than 7700000 and less than or equal to 21075000. Following that, for all other instances (which would be less than 7700000), we tell R to return "low".
+2.	We then took all rows where the `casualty_est` variable was greater than 7,700,000, and replaced `casualty_category` with “high”.
+
+3.	We then took all rows where the `casualty_est` variable was less than or equal to 7,700,000, and replaced `casualty_category` with “low”.
+
+Now it’s your turn. Below, write code to make a new variable, called `since_1800`, that is TRUE for any war that began after 1800 (that is, the `start_year` variable is at least 1800), and FALSE for any war that began prior to 1800 (that is, the `start_year` variable is prior to 1800). 
+
+```{r since1800, exercise = TRUE, exercise.lines = 10}
+
+```
+```{r since1800-hint-1}
+# create placeholder variable and set it equal to NA for all rows
+war_data$___ <- ___
+
+# create label for wars started in or after 1800
+war_data$since_1800[war_data$start_year ___ 1800] <- "___"
+
+# create label for wars started before 1800
+war_data$since_1800[war_data$start_year ___ 1800] <- "___"
+```
+```{r since1800-hint-2}
+# create placeholder variable and set it equal to NA for all rows
+war_data$since_1800 <- NA
+
+# create label for wars started in or after 1800
+war_data$since_1800[war_data$start_year >= 1800] <- "TRUE"
+
+# create label for wars started before 1800
+war_data$since_1800[war_data$start_year < 1800] <- "FALSE"
+
+# check the new value
+war_data$since_1800
+```
+
+## Topic 6: Factors
+
+So far, we’ve been working with three types of data: numeric (numbers), characters (text), and Boolean (TRUE/FALSE). When we think about data stored as characters (text), we can think about two different situations. Sometimes, the text is people’s names or other information that’s very specific to one row of the dataset. Other times, the text is telling us the category a row falls into. For example, if we have a dataset of students and a variable called “year”, that variable might categorize students into “first-year”, “sophomore”, “junior”, and “senior”. Many datasets have lots of categorical variables like this. This lesson introduces a new data type: Factors. Factors are a data type specifically designed for handling categorical data in R.
+
+There are two main types of categorical variables: nominal and ordinal.
+
+1. **Nominal** variables have categories with no inherent order. Examples include party affiliation (e.g., Republican, Democrat, Independent) and gender (male or female).
+
+2. **Ordinal** variables have categories with a natural ranking or order. For example, language proficiency levels may be classified as Beginner, Intermediate, and Advanced.
+
+### Using the factor() Function
+
+`R` has a special type of data called a factor that is useful when we have categorical data. To see how it works, let’s first look at the limitation of using a character vector to store categorical information:
 
 
 
+```{r eval = T}
+party <- c("Republican", "Democrat", "Democrat", "Republican") #create a vector
+str(party) # we see that party is currently a character variable
+summary(party) # we see that str() is more informative than summary()
+```
+
+When we look at the output from `summary(party)`, we can see that it’s not very informative. Next, let’s make a new vector, `party.factor`, that stores the same information as a factor. We will do this by running the `factor()` command on the vector called `party`. 
+
+```{r eval = T}
+party.factor <- factor(party) # create a factor for party affiliation using factor()
+party.factor # inspect the resulting object
+```
+
+Already, we can see a difference: when we display the party.factor vector on the screen, it shows us the values stored in the vector, but also gives us something called **levels**. In a factor variables, the list of **levels** is the set of values that variable can take. 
+
+Now, let’s see what happens when we summarize our new factor variable:
+
+```{r eval = T}
+summary(party.factor) # now that we have converted party to a factor variable, summary() is more useful!
+```
+
+Before, `summary(party)` just told us that it was a character vector. Now, `summary(party.factor)` is giving us much more useful information: it tells us how many observations fall into each category!
+
+### Specifying Levels
+
+Sometimes we may want to change the order of the levels in a factor. For example, let's make Republican the first level and Democrat the second:
+
+```{r eval = T}
+party.factor2 <- factor(party, levels = c("Republican", "Democrat")) # specify the levels
+str(party.factor2) # inspect output 
+```
+
+Great! Now `party.factor2` has Republican as the first level and Democrat as the second level. 
+
+### Ordered Factors
+
+As noted above, party affiliation is a nominal variable – there’s no natural order of categories like “Republican” and “Democrat”. Other variables are ordinal – this means they have a natural hierarchy. Let’s take the example of language proficiency levels: say an individual could be a beginner, intermediate, or advanced. We want R to store the variable so that it considers beginner “less than” intermediate, which is “less than” advanced. 
+
+To do this, we need to add two optional inputs to the factor() command. Say we have the vector below of language levels, and we make it into an unordered factor:
+
+```{r eval = T}
+proficiency <- c("Advanced", "Beginner", "Intermediate", "Intermediate", "Advanced") #create a vector
+proficiency.factor <- factor(proficiency) # create factor
+str(proficiency.factor) # inspect output
+```
+
+As you can see, R puts the factors in alphabetical order, but doesn’t consider one better/worse than the other. To make it an ordered factor, we need to add two optional commands:
+
+1.	We need to specify that it’s an ordered factor by adding `ordered=T`.
+2.	We need to specify the exact order we want the levels in.
+
+The code below remakes the vector and adds the optional commands, separated by “,”. 
+
+```{r eval = T}
+proficiency.factor <- factor(proficiency,ordered = T, levels = c("Beginner", "Intermediate", "Advanced")) # create factor
+str(proficiency.factor) # inspect output
+```
+
+As you can see, R identifies `proficiency.factor` as an ordered factor with three levels: Beginner, Intermediate, and Advanced.
+
+A lot of people find factors confusing at first. Don’t worry – we’ll spend a lot more time on this in class, including some more ways using factors, as opposed to storing data as normal text, can be useful.
