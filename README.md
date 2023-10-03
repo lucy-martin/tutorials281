@@ -33,3 +33,6 @@ Where TUTORIAL_NAME corresponds to the name of each subfolder within the `inst` 
 * week3_tutorial
 * week4_tutorial
 * week5_tutorial
+* week6_tutorial
+* week7_tutorial
+
