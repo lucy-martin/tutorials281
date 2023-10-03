@@ -40,6 +40,9 @@ world_values$age_group <- ifelse(world_values$age <= 25, 1,
                                                              ifelse(world_values$age > 75, 6,
                                                                     NA))))))
 
+world_values <- world_values %>%
+  mutate(gender = recode(sex, `1` = "Male", `2` = "Female"))
+
 world_values <- world_values %>% select(-age)
 
 #creation of trust_byage df for plotting 
@@ -49,286 +52,226 @@ trust_byage <- world_values %>%
   group_by(age_group) %>% #group by age
   summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean
 
+trust_bygender <- world_values %>%
+filter(!is.na(gender)) %>%
+group_by(gender) %>% #group by gender
+summarize(avg_trust = mean(conf_churches, na.rm = T))
+
+# set up afrobarometer data
+afrobarometer <- read.csv("ab_selectedvars.csv")
 ```
 
 
-## Welcome to Data Visualization!
+## Welcome! 
 
-This week, we will learn how to visualize our data. That is, we will learn how to examine data via graphs and figures. There are many ways to visualize data, and this often depends on the variables we are interested in. In particular, it is important to consider if the data we are plotting is discrete (aka categorical) or continuous.
+Until now, we have been describing datasets by using commands like `mean()` and `table()`. This week, we will learn how to create visualizations (graphs and figures) to better perform descriptive data analysis. There are many ways to visualize data, and this often depends on the variables we are interested in. 
 
-The main package we will use to visualize data is called `ggplot2`, which is part of the tidyverse. Our skills in using `dplyr` and the `tidyverse` will come in handy here, as we often need to manipulate and summarize our data before visualizing it.
+The main package we will use to visualize data is called `ggplot2`, which is part of the `tidyverse`. Our skills in using `dplyr` and the `tidyverse` will come in handy here, as we often need to manipulate and summarize our data before visualizing it.
 
-Note that to use `ggplot2` on your device, you will need to install and load its library. You can do so by specifically installing the `ggplot2` package and library, but also, because it is also part of the larger `tidyverse`, it is installed and loaded when you read in `tidyverse` package as well!
+Normally, when we use a new package of commands, we need to first install (i.e. download) it to `R`. However, the package we will be using this week (`ggplot2`) is part of the `tidyverse`: this means that you already installed it when you ran `install.packages(“tidyverse”)` last week. 
 
-For example, you can do the following:
-
+What you will still need to do in order to use `ggplot2` is load it into `R`’s active library. You can do that like this: 
 
 ```{r, eval = F, echo = T}
-
 library(tidyverse) #note here you do not need quotes
-
 ```
 
-Note that you do not need to install the library for the tidyverse on your machine since we already did so last week. OR you can do the following:
-
+If you were ever working with a computer that didn’t have the `tidyverse` installed, you could run the following code to install and load it: 
 
 ```{r, eval = F, echo = T}
-
 install.packages("ggplot2")
-
 library(ggplot2) #note here you do not need quotes
-
 ```
 
+## Topic 1: Types of Variables
 
+When visualizing data, it is important to understand that there are many different types of graphs and figures that you can use. The next topic will cover some of these in more depth. But, before we do so, it will help to understand the different types of variables we use. So far, we’ve been talking mainly about variables in terms of their formal data type: character, numeric, Boolean, factor. Another way to categorize variables is by whether they are **discrete** or **continuous**.
 
+***Discrete variables***. A “discrete” variable is one that can only take on a finite number of values. Here are some examples:
 
-## Topic 1: Understanding the Basics of Data Visualization
+- Most character and factor variables are discrete. For example, the variable “partyID” might only take on the values of Democrat and Republican.
 
-When visualizing data, it is important to understand that there are **many** different types of graphs and figures that you can use. We will cover a few types here.
+- Numeric variables can also be “discrete” when they have a limited number of unique values. For example, a variable measuring ideology may only take on the values 1, 2, 3, 4, 5, 6, or 7: nothing in between is possible.
+
+- Boolean variables are always discrete, as they can only take on 2 values (True or False).
+
+***Continuous variables***. In contrast to a discrete variable, we say a variable is “continuous” when it can take a whole range of values. Typically, continuous variables are numeric. Here are some examples:
+
+- Household income: Say we have a dataset where respondents’ household incomes range from $0 to $250,000 a year. Even if we don’t have every single number represented, this would still be a continuous variable.
+
+- Age: People’s ages will cover some range, say 18-95.
+
+Note that many variables we treat as continuous may not truly take on any value. For example, our dataset may not let people choose 25.7 as their age. Or, we may ask people to place themselves on a scale from 0 to 20. The key is that a variable has enough values that it makes sense to think of it as a continuum.
+
+## Topic 2: Visualizations for Summarizing a Single Variable
+
+One common type of visualization looks at just one variable. Often the goal is similar to the `summary()` function: you want to get a sense for the range of values a variable takes in your dataset, and how common each value is are. Depending on whether your variable is continuous or discrete, you will typically use either a histogram or a bar graph to look at your data.
 
 ### Histogram
 
-We use **histograms** to plot the distribution of a variable. That is to say, the frequency of different values of that variable. For example, the below histogram from the [SAS blog](https://blogs.sas.com/content/iml/2019/03/04/visualize-sat-scores-nc.html) shows us the distribution of SAT scores in North Carolina high schools. We can see from this plot that most students in the class of 2018 got a score of about 1100. 
+One common type of graph is called a **histogram**. Histograms plot information for a single variable. Histograms are useful if you want to get a sense of how common different values of a variable are. For example, if you had a dataset that include respondents’ ages, you could use a histogram to plot how frequently people of each age show up in your dataset. The x-axis would show all the possible values of the variable, and the y-axis would show how common each of those values was in your dataset. We will often call this the distribution of a variable. Histograms are typically used for continuous variables.
+
+For example, the below histogram from the [SAS blog](https://blogs.sas.com/content/iml/2019/03/04/visualize-sat-scores-nc.html) shows us the distribution of SAT scores in North Carolina high schools. On the x-axis, we can see all the possible SAT scores. On the y-axis, we have the percent of the sample that had that SAT score. The bars of the graph show, for a group of test scores, what percent of the sample got that score.
+
+From the histogram below, we can see that the most common scores (that is, those with the highest bars) are around 1050 to 1150. While some students score around 800, there aren’t very many of them. Very few students score above a 1300.
 
 <iframe src="https://drive.google.com/file/d/1iEstpnb5j1T-FT267_oHs8PF5O4qoedQ/preview" width="640" height="480" allow="autoplay"></iframe>
 
-Importantly, histograms are used for continuous data. The main variable of interest -- shown on the S axis -- is divided into "bins" or ranges of values. In this case, our main variable of interest is the SAT score. The creator of this graph created bins for each range of scores, and plotted the relative frequency of students who acheived these scores. 
+When you have a new dataset, it’s often helpful to use a histogram to get a more comprehensive look at how common different values of a variable are. You can think of it as the graphical equivalent of the `summary()` command.
 
 ### Bar Graphs
 
-Next we have **bar graphs**, or bar charts. These are commonly confused with histograms, but they are very different. While we use histograms to plot continuous data, bar graphs are used for plotting discrete, or categorical, variables. For example, the below graphic comes from the AmericasBarometer's Assessment of [Satisfaction with Public School's in Latin America](https://www.vanderbilt.edu/lapop/insights/IO958en.pdf), and shows how the percentage of individuals satisfied with public schools varies across countries. On the X axis we have different countries (represented by their two-letter abbreviation). The Y axis instead corresponds to the percentage of individuals who reported being satisfied. 
+Next we have bar graphs, or bar charts. We’re going to see multiple ways to use bar graphs. For now, let's focus on how bar graphs are used to summarize a single variable. This type of bar graph is similar to a histogram, in that it shows what percent of your data falls into different categories. The big different is that histograms are better for plotting continuous variables, while bar graphs are better at plotting discrete variables.
+
+These are commonly confused with histograms, but they are very different. While we use histograms to plot continuous data, bar graphs are used for plotting discrete, or categorical, variables. 
+
+For example, the bar chart below shows us the results of a survey conducted by [Russia Watcher](https://twitter.com/russia_watcher/status/1626341318413922304/photo/1), an organization based at Princeton University that aims to understand public opinion in Russia since the start of the war in Ukraine in February 2022. This particular chart shows how respondents answered the following question in February 2023, one year after the war began: "Do you think that a year from now you (your family) will live better or worse than now?" The x-axis shows the possible answers, and the y-axis shows the percentage of respondents who chose each answer. As you can see 31.2 percent of respondents answered "The same as now," whereas only 6.4 percent of respondents answered "Much worse." Interesting!
+
+
+![Public opinion in Russia during the war in Ukraine.](/tutorials281/inst/week6_tutorial/Russia.png)
+
+
+## Topic 3: Visualizations That Use Multiple Variables
+
+Many times we use data visualizations to explore the relationship between two variables. We will typically choose one variable to put on the x-axis, and one to put on the y-axis. Depending on whether each variable is discrete or continuous, we will use a different type of graph.
+
+### Bar Graphs
+
+In the previous topic, we saw how bar graphs could be used to summarize a single variable. Bar graphs are also useful for summarizing two variables, especially when one of the variables is discrete (categorical).
+
+For example, say we have a dataset that shows, for different countries, the percent of citizens who are satisfied with the quality of public schools. We might want to have a graph that shows how satisfaction varies across countries. Bar graphs give us a way to do this. Take a look at the graph below, which is from the AmericasBarometer’s Assessment of [Satisfaction with Public School's in Latin America](https://www.vanderbilt.edu/lapop/insights/IO958en.pdf). On the x-axis is the variable country. On the y-axis is the percent of individuals satisfied with public schools. Each bar shows the average level of satisfaction for a given country.
 
 <iframe src="https://drive.google.com/file/d/1Ncr5nNAtLroaPk6hq_xjphyWtwgR4-oH/preview" width="640" height="480" allow="autoplay"></iframe>
 
-
 ### Scatter Plots
 
-**Scatter plots** help us visualize two distinct continuous variables. Each dot represents an observation, which corresponds to its values on both the X and Y axes. For example, the plot below from [The World Bank's Atlas of Sustainabile Development Goals (2023)](https://datatopics.worldbank.org/sdgatlas/goal-1-no-poverty), shows us the relationship between GDP (gross domestic prodcut) per captia (on the X axis) and the poverty rate (on the Y axis) across a variety of countries. Each dot represents a country, in this case. We can see from this plot that, in general, countries with more extreme poverty tend to have lower levels of GDP.
+Scatter plots help us visualize two distinct continuous variables. Each dot represents an observation, which corresponds to the values of two variables (say X and Y) for a single observation in the dataset. For example, the plot below from [The World Bank's Atlas of Sustainabile Development Goals (2023)](https://datatopics.worldbank.org/sdgatlas/goal-1-no-poverty), shows us the relationship between each country’s GDP per capita (average wealth or income) and the poverty rate (on the y-axis). Each dot represents a country, in this case. We can see from this plot that, in general, countries with more extreme poverty tend to have lower levels of GDP.
 
 <iframe src="https://drive.google.com/file/d/1cGoI6PswHHi9R2SAMo_MOuK3M-1G-vcX/preview" width="640" height="400" allow="autoplay"></iframe>
 
 
 ### Line Graph
 
-**Line graphs** are another means by which to plot continuous data. They are often useful to plot trends, such as trends over time or across different values of a variable. For example, the following graph comes from the [Pan American Health Organization](https://opendata.paho.org/en/core-indicators/visualizations) and examines how the total percent of the population living in urban areas in Canada and the United States has grown over time. On the X axis, we have year (a continuous variable, in this case) and on the Y axis we have the % of the population that is urban.
+**Line graphs** are another means by which to plot continuous data. They are often useful to plot trends, such as trends over time or across different values of a variable. For example, the following graph comes from the [Pan American Health Organization](https://opendata.paho.org/en/core-indicators/visualizations) and examines how the total percent of the population living in urban areas in Canada and the United States has grown over time. On the x-axis, we have year (a continuous variable, in this case) and on the y-axis we have the % of the population that is urban.
 
 <iframe src="https://drive.google.com/file/d/1nMasKnkNHyDrnQQkmyDW1TzjPkotO4dY/preview" width="640" height="360" allow="autoplay"></iframe>
 
-Importantly, this line graph also contains some categorical information -- country name! Here, color helps to capture this categorical information (a different color line for each country, with a corresponding legend). Across many types of visualizations, we can incorporate things like color or line type to help us capture categorical variables as well. So here, the authors use two different colored lines to include two distinct countries.
-
-
-### Pie Chart
-
-While there are many more types of ways to visualize data, we will conclude this introduction with **pie charts**. Pie charts are circle graphs where each slice represents a part of the whole. They help us to illustrate how variables break down in terms of their composition. For example, the below graphic comes from an analysis of race and religion in Politcs published in [The Washington Post](https://www.washingtonpost.com/news/the-fix/wp/2012/09/10/the-politics-of-race-and-religion-in-two-pie-charts/). It breaks down the religious identification and race of Republicans in 2012. It shows us, for example, that out of all Republicans included in this data, 34 percent identify as both white and evangelical Protestant. 
-
-<iframe src="https://drive.google.com/file/d/19XJZMb_gM2kUz3j2KpcZ1iY_2L_eFa7r/preview" width="640" height="480" allow="autoplay"></iframe>
-
+## Topic 4: Using `ggplot2()` Part 1
 
 ### Choosing the appropriate type of graph
 
-Now that we have a few types of graphs under our belts, it is important to understand how we decide which type of data visualization to use. The following will help you to make this decision as you visualize your own data:
+Now that we have a few types of graphs under our belts, we can start learning how to make different types of graphs in `R`. In class we will talk more about how to choose which type of graph is best for different tasks, but in general it is good to think about the following:
 
 - What type of data am I plotting? Are the variables discrete or continuous?
-- What relationship am I trying to show?
+
+- What relationship am I trying to show? Do I need one variable or two?
+
 - What is the simplest way for me to convey this relationship?
 
+To plot data in `R`, we will be using the `ggplot2` package. We’ll start with an example where we can make a graph using the full dataset. We’ll then move on to an example where we have to summarize the data using `dplyr` before we make the graph.
 
+### Example 1: Making a Histogram
 
+To understand how to use `ggplot2` , we will walk through an example that uses the AfroBarometer dataset we’ve seen in class. In particular, we’ll make a histogram that shows the distribution of the age variable.
 
+Before, if we wanted to know something about how a variable is distributed, we often used the `summary()` command, like this: `[RUN summary(afrobarometer$age)]`
 
-## Topic 2: Using ggplot2
+This gives us some information about the age variable, but it’s incomplete. Let’s see if graphing the distribution in a histogram is more useful. To do this, we’ll use the `ggplot()` function. The ggplot has a couple of parts. The first part will always look like this:
 
-To plot data in R, we will be using the `ggplot2` package. But before we jump in there, it is essential to note that very little data is ready to be plotted from the get go. Often, we will need to summarize our data first using `dplyr` before we plot. Never forget this! 
+```{r, eval = F}
+ggplot(dataframe, aes(x = ___, y = ___)
+```
 
-### Plotting confidence in churches by respondent citizenship status
+Our first necessary argument is `dataframe`. This is where we tell `R` what dataframe we want `ggplot` to plot! Second, we have `aes` which stands for “aesthetics”. This is where we tell `R` what we want to go on the X and (when relevant) Y axes. Histograms are unique in that we are only plotting a single x variable. So, with that in mind, we would begin with the following code:
 
-We're going to illustrate how to use `ggplot2` with an example. Today, we'll be using the World Values Survey, which here is saved as `world_values`. We have close to 95000 observations of individuals across the world about their opinions regarding government, trust in institutions, and their values. Let's say we are interested in examining how confidence in churches by the citizenship status of respondents.
+```{r, eval = F}
+ggplot(afrobarometer, aes(x = age))
+```
+
+Above we tell `ggplot` that we want to graph data from the `afrobarometer` dataset, and that the on the x-axis we will be plotting age.
+
+But, by itself, this code won’t produce anything. When you use ggplot, you always have to tell `R` which type of graph you want to make. To do this, we’ll use a `+` sign and then write the command for the type of graph we want. Here, we’ll use geom_histogram():
+
+```{r e1, exercise=T, eval = T, error=F, message=F, warning=F}
+ggplot(afrobarometer, aes(x = age)) +
+  geom_histogram()
+```
+
+We made a graph!
+
+All of the graphs you create in this class will follow the same basic structure we just saw. That is, you’ll write a line of code that includes the `ggplot()` command, followed by a type of graph: `ggplot(dataframe, aes(x=__, y=__) + typeofgraph`
+
+Some common types of graphs, and their associated commands, are:
+
+1. Bar graph: `geom_col()`
+
+2. Line graph: `geom_line()`
+
+3. Scatterplot: `geom_point()`
+
+## Topic 5: Using `ggplot2()` Part 2
+
+In the previous topic, we saw how to make a simple histogram. However, it’s rare that you’ll be able to create a graph from a raw dataset. Often, you’ll need to use `dplyr` to make a summary dataset first.
+
+### Plotting confidence in churches by respondent gender
+
+We’re going to illustrate how to create a summary dataset to use with `ggplot2` with an example. Today, we’ll be using the World Values Survey, which here is saved as `world_values`. This dataset has close to 95,000 observations, with each row representing a survey respondent. Respondents come from countries all over the world. The questions we are interested in ask about respondents’ opinions regarding government, trust in institutions, and their values. Let’s say we are interested in examining how confidence in churches varies among by the gender of respondents.
 
 First, run the following line of code to take a look at our data:
 
-```{r summary1, exercise = TRUE}
-
-summary(world_values)
-
+```{r ex2, exercise = T, eval = T}
+head(world_values)
 ```
 
-Okay, looks like we have a few different variables here which capture confidence, in addition to respondent citizenship status, we also have sex, socioeconomic class, and the age group of respondents. For `age_group`, it is important to note that each group corresponds to the following age ranges:
+We want to focus on two of these variables: `conf_churches` captures confidence in the church, and ranges from 1 (low confidence) to 4 (high confidence). `gender` captures respondent gender, and is “Male” or “Female”.
 
-* Group 1 = 16-25 years old
-* Group 2 = 26-35 years old
-* Group 3 = 36-45 years old
-* Group 4 = 46-55 years old
-* Group 5 = 56-75 years old
-* Group 6 = 75 years old and above
+What would be the best way to plot the relationship between these variables? Well, we probably want to use a bar graph. On the x-axis we want gender: there will be 1 bar for Male respondents, and 1 bar for Female respondents. On the y-axis we’ll have the average level of trust in churches: each bar will therefore show the average trust for that gender.
 
+The best way to make this graph is to first make a summary dataset. We’ll want this dataset to have 2 columns, and 2 rows, and look a bit like the below:
 
-Let's re-code `citizen` so that it is easier to understand. According to the codebook, the survey asked respondents: Are you a citizen of this country?. The value `1` corresponds to "yes I am a citizen of this country" while `2` corresponds to "no, I am not a citizen of this country."
+| **Gender** |     **`avg_trust`**     |
+|:----------:|:-----------------------:|
+| Male       | [avg trust among men]   |
+| Female     | [avg trust among women] |
 
-Below, we recode this variable to have more informative information using the `ifelse()` command. Run the following line of code, and take a look at the new variable:
+To make this dataset, we can use the `dplyr` commands we learned last week. Run the code below to make the summary dataset:
 
-```{r citizen_recode, exercise = TRUE, exercise.lines = 7}
-
-world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
-                           ifelse(world_values$citizen == 2, "Non-Citizen",
-                                  NA))
-
-#take a look at how many in each category
-table(world_values$citizen)
-
+```{r ex3, exercise = T, eval = T, echo = T}
+# create new data frame called trust_bygender
+trust_bygender <- world_values %>%
+group_by(gender) %>% #group by gender
+summarize(avg_trust = mean(conf_churches, na.rm = T)) #calculate the mean trust for each group
+trust_bygender #take a look at the final DF
 ```
 
-Great. The codebook also tells us that for all confidence questions, higher values (in this case, a maximum of 4) corresponds to higher confidence, while lower values correspond to lower confidence.
+Take a look back at our draft table above---this looks like what we wanted!
 
-What would be the best way to plot the relationship between these variables? Well, first we should probably consider that we need to calculate an *average level of trust* in churches for each sex. We can do so easily using dplyr. Execute the following line of code, and take a look at our new summarized data:
+Now we’re finally ready to make our graph. Remember, the `ggplot()` function generally looks like this:
 
-
-```{r trust_bycitizen1, exercise = TRUE, exercise.setup = "citizen_recode"}
-
-# create new data frame called trust_bycitizen
-trust_bycitizen <- world_values %>%
-  select(citizen, conf_churches) %>% #select only needed variables
-  filter(!is.na(citizen)) %>% #remove NAs
-  group_by(citizen) %>% #group by sex
-  summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean trust for each group
-
-
-
-trust_bycitizen #take a look at the final DF
+```{r, eval = F}
+ggplot(data, aes(x = ___, y = ___) + typeofgraph()
 ```
 
-Now we have a new data frame called `trust_bycitizen` which has the mean value of confidence in churches for both citizens and non-citizens. Since we are interested in a discrete variable (citizenship) and two average values of confidence, our best bet here is a bar graph. But how do we do that? With the `ggplot` function!
-
-The `ggplot()` function begins as such:
+Our first necessary argument is `data`. This is where we tell `R` what data we want `ggplot` to plot. When we made a histogram in the previous topic, this was just our full dataset. Now it’s different! The data we want to plot isn’t in `world_values`, it’s in `trust_bygender`. Second, we have aes, which is where we tell R what we want to go on the X and Y axes. For a histogram we only specified the x-axis. Now we need to specify both x and y. So, with that in mind, we would begin with the following code:
 
 ```{r, eval = FALSE}
-
-ggplot(data, aes(x = ___, y = ___)
-
+ggplot(world, aes(x = gender, y = avg_trust))
 ```
 
-Our first necessary argument is `data`. This is where we tell R what data we want `ggplot` to plot! Second, we have `aes` which stands for "aesthetics". This is where we tell R what we want to go on the X and Y axes. So, with that in mind, we would begin with the following code:
+Above we tell `ggplot` that our data is saved as `trust_bygenderand` on the x-axis we will be plotting gender while on the y-axis we will be plotting `avg_trust`.
 
-```{r, eval = FALSE}
+But, we’re not done! We have not yet specified what type of graph we want. To specify that we want a bar graph, we will use the option `geom_col()`. We will add it on to our first line of code with a `+`. Execute the following chunk of code to see what happens:
 
-ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust))
-
-```
-
-Above we tell `ggplot` that our data is saved as `trust_bycitizen` and on the x axis we will be plotting `citizen` while on the y axis we will be plotting `mean_trust`. 
-
-But, we're not done! We have not yet specified what *type* of graph we want. To specify that we want a bar graph, we will use the option`geom_col()`. We will add it on to our first line of code with a `+`. Execute the following chunk of code to see what happens:
-
-```{r trust_bycitizen_df, echo = FALSE}
-## SETUP CHUNK FOR BELOW EXERCISE
-
-world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
-                           ifelse(world_values$citizen == 2, "Non-Citizen",
-                                  NA))
-
-# create new data frame called trust_bycitizen
-trust_bycitizen <- world_values %>%
-  select(citizen, conf_churches) %>% #select only needed variables
-  filter(!is.na(citizen)) %>% #remove NAs
-  group_by(citizen) %>% #group by sex
-  summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean trust for each group
-
-```
-
-
-```{r trust_plot1, exercise = TRUE, exercise.setup = "trust_bycitizen_df"}
-
-ggplot(trust_bycitizen, aes(x = citizen, y = mean_trust)) +
+```{r ex4, exercise = T, eval = T, echo = T}
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
   geom_col()
-
 ```
 
-And look at that! We have a graph. Notice that non-citizens tend to have higher trust in churches.
+And look at that! We have a graph. Note that males tend to have more trust in churches than females, but not by much!
 
 Further, there are many different types of graphs that `ggplot` can produce. You are not expected to memorize them. Rather, we suggest that you always take a look at [this handy cheat sheet developed by Posit](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf).
 
-
-
-### Plotting confidence in churches by respondent age
-
-Now let's examine a case of plotting two variables. Instead of looking at respondent sex, we are now interested in age (or in this case, age groups!). What might we do in this case?
-
-Note that today we are using the variable `age_group`. This is to simplify things a bit, instead of using a variable which has respondents age in years. The `age_group` variable has 6 values, and we will treat it as continuous. Remember that the value of 1 correspondents to our youngest respondents, while the value of 6 corresponds to our oldest respondents.
-
-Let's first try out a scatterplot. To do so, we will add to our `ggplot` command the line `geom_point()`, which tells the function that we are interested in plotting points. We will specify `age_group` as our X axis variable, and `conf_churches` as our Y axis variable.
-
-```{r geom_point_test, exercise = TRUE}
-
-ggplot(world_values, aes(x = age_group, y = conf_churches)) +
-  geom_point()
-
-```
-
-Well, this doesn't look great. It is not a particularly informative graph. It seems like a scatterplot is not a great option here! Why might that be? Well, we only have four possible values that our y variable (confidence in churches) could take on here. So we are simply clustering all 95,000 data poitns we have on these four values. Instead, let's consider a different strategy.
-
-Let's try a line graph. In this case, we might want to see how **average trust** varies with age. Once again, we will need to summarize our data. You will get involved for this step! Below, create a new object called `trust_byage`. Follow the same code we utilized above to summarize age by sex, but now do so with the age variable. 
-
-```{r trust_byage, exercise = TRUE}
-
-
-
-```
-```{r trust_byage-hint-1}
-
-# create new data frame called trust_byage
-trust_byage <- ___ %>%
-  select(___) %>% 
-  filter(___) %>% 
-  group_by(___) %>% 
-  summarize(___ = mean(___, ___)) #calculate the mean
-
-
-trust_byage #take a look at the final DF
-
-
-```
-```{r trust_byage-hint-2}
-
-# create new data frame called trust_byage
-trust_byage <- world_values %>%
-  select(age_group, conf_churches) %>% #select only needed variables
-  filter(!is.na(age_group)) %>% #remove NAs
-  group_by(age_group) %>% #group by age
-  summarize(mean_trust = mean(conf_churches, na.rm = T)) #calculate the mean
-
-trust_byage #take a look at the final DF
-
-
-```
-
-
-Great! Now that we have out `trust_byage` object to work with, we can create our plot. You are going to do so using the code provided below, and with the following specifications:
-
-- Data = `trust_byage`
-- X axis = `age_group`
-- Y axis = `mean_trust`
-- Command for line plot = `geom_line()`
-
-
-
-```{r trust_byage2, exercise = TRUE}
-
-ggplot(___, aes(x = ___, y = ___)) +
-  #insert type of graph here
-
-
-```
-```{r trust_byage2-hint-1}
-
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
-  geom_line()
-```
-
-This figure helps us see the relationship a bit more clearly. It seems trust in churches increases with age, until about the 5th age group (55-75), and then it begins to decrease. 
-
-
-
-## Topic 3: Improving our visualizations
+## Topic 6: Improving Our Visualizations
 
 In the last topic, you learned to make basic graphs. But as-is, they are not super visually appealing, and are difficult to read. 
 
@@ -336,44 +279,40 @@ There are a ton of ways to make graphs prettier by adding *options*. You are not
 
 ### Axis Labels
 
-First, it is crucial to have labels on your axes that your audience can interpret. For example, let's take our past graph about trust in the church and respondent age.
+First, it is crucial to have labels on your axes that your audience can interpret. For example, let's take our past graph about trust in the church and respondent gender.
 
-```{r}
+```{r error=F, message=F, warning=F}
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
+  geom_col()
+```
 
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
-  geom_line()
+Ideally, we would like to have the x-axis label be a bit more information. For example, we want "Gender" to be properly capitalized and helps our audience know the unit that we are using. To do this, we can use the `labs` argument as follows. Execute the following code chunk to check it out:
+
+```{r  trust_byage5, exercise = TRUE, exercise.lines = 7, error=F, message=F, warning=F}
+
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
+  geom_col() + 
+  labs(x = "Gender") # x-axis label
 
 ```
 
-Ideally, we would like to have the x-axis label be a bit more information. For example, "Age Group" is properly capitalized and helps our audience know the unit that we are using. To do this, we can use the `labs` argument as follows. Execute the following code chunk to check it out:
-
-```{r  trust_byage5, exercise = TRUE, exercise.lines = 7}
-
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
- geom_point() +
-  geom_line() + 
-  labs(x = "Age Group") # x axis label
-
-```
-
-Nice! It worked. Now, why don't know add a more informative label to the y axis? Started code has been provided to you below.
+Nice! It worked. Now, why don't know add a more informative label to the y-axis? Started code has been provided to you below.
 
 
-```{r age_plot, exercise = TRUE, exercise.lines = 7}
+```{r gender_plot, exercise = TRUE, exercise.lines = 7, error=F, message=F, warning=F}
 
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
-  geom_point() +
-  geom_line() +
-  labs(x = "Age Group", #x axis label
-       y = ___) # y axis label
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
+  geom_col() +
+  labs(x = "Gender", #x-axis label
+       y = ___) # y-axis label
 
 ```
-```{r age_plot-hint-1}
 
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
-  geom_point() +
-  geom_line() +
-  labs(x = "Age Group",
+```{r gender_plot-hint-1}
+
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
+  geom_col() +
+  labs(x = "Gender",
        y = "Avg. Confidence in Churches (1-4 scale)")
 
 ```
@@ -388,168 +327,25 @@ To many, a simple white background in a plot is preferable to a grey background.
 
 Below, add a line to the plot (remember to use the `+`) and place the line `theme_bw()` at the end of the plot.
 
-```{r age_plot2, exercise = TRUE, exercise.lines = 7}
+```{r age_plot2, exercise = TRUE, exercise.lines = 7, error=F, message=F, warning=F}
 
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
-  geom_point() +
-  geom_line() +
-  labs(x = "Age Group", # x axis label
-       y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") + 
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
+  geom_col()+
+  labs(x = "Gender", # x-axis label
+       y = "Avg. Confidence in Churches (1-4 scale)", # y-axis label
+       title = "Gender vs. Confidence in Churces") + 
   ______ # add new line here with new option
 
 ```
 ```{r age_plot2-hint-1}
 
-ggplot(trust_byage, aes(x = age_group, y = mean_trust)) +
-  geom_point() +
-  geom_line() +
-  labs(x = "Age Group", # x axis label
-       y = "Avg. Confidence in Churches (1-4 scale)", # y axis label
-       title = "Age vs. Confidence in Churces") + # title
+ggplot(trust_bygender, aes(x = gender, y = avg_trust)) +
+  geom_col()+
+  labs(x = "Gender", # x-axis label
+       y = "Avg. Confidence in Churches (1-4 scale)", # y-axis label
+       title = "Gender vs. Confidence in Churces") + # title
   theme_bw()
 
 ```
-
-
-
-## Topic 4: Practice and Comprehension Quiz
-
-Let's put what you learned to the test! Your task is to create two graphs. You will not have **all** of the information you need from this tutorial, and you will need to reference the [Posit ggplot2 Cheat Sheet](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf).
-
-Here, we will be examining trust in the government generally speaking both by respondent's citizenry (whether or not they are a citizen in their country of residence) and their socioeconomic class. The variables we will be using are as follows:
-
-* `conf_govt`: confidence in government on a 1-4 scale 
-* `citizen`: 2 = not a citizen of the country, 1 = citizen of the country
-* `class`: self-reported socioeconomic class from a 1-5 scale (where 1 is lower class, and 5 is upper class)
-
-First, let's recode `citizen` so it is a bit easier to interpret. Recode the variable so it has two values: "Citizen" and "Non-Citizen". Use an `ifelse()` statement to do so. Remember, we did this before, so this should just be a refresher!
-
-```{r citizen, exercise = TRUE}
-
-world_values$citizen <- ___
-
-```
-```{r citizen-hint-1}
-
-world_values$citizen <- ifelse(___, ___,
-                           ifelse(___, ___, NA))
-
-```
-```{r citizen-hint-2}
-
-world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
-                           ifelse(world_values$citizen == 2, "Non-Citizen", NA))
-
-```
-
-
-```{r, echo = FALSE, eval = TRUE}
-
-world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
-                           ifelse(world_values$citizen == 2, "Non-Citizen", NA))
-
-```
-
-**1) Bar Graph**
-
-First, plot the average level of confidence in the government for citizens and non-citizens. Don't forget that you'll have to summarize the data first using dplyr! Note that for a bar graph, you will need to specify that `fill = "blue"` instead of color to fill the whole bar with that color. Complete the following tasks:
-
-* Make the bars be "blue"
-* Label the x axis "Citizenship Status"
-* Label the y axis "Avg. Confidence in Gov't (1-4 scale)"
-* Give the figure a black and white background
-
-```{r prepare-citizen, echo = F, eval = T}
-#have this here to make sure variable is properly adjusted prior to activity
-world_values$citizen <- ifelse(world_values$citizen == 1, "Citizen",
-                           ifelse(world_values$citizen == 2, "Non-Citizen", NA))
-```
-
-
-```{r citizen_govt, exercise = TRUE, exercise.setup = "prepare-citizen"}
-
-
-```
-```{r citizen_govt-hint-1}
-citizen_govt <- ___ %>%
-  select(___) %>%
-  filter(___) %>%
-  group_by(___) %>%
-  summarize(mean_trust = ___)
-
-
-ggplot(___, aes(x = ___, y = ___) +
-  geom_col(___) +
-  labs(___) +
-  theme_bw()
-
-```
-```{r citizen_govt-hint-2}
-
-citizen_govt <- world_values %>%
-  select(conf_govt, citizen) %>%
-  filter(!is.na(citizen)) %>%
-  group_by(citizen) %>%
-  summarize(mean_trust = mean(conf_govt, na.rm = T))
-
-
-ggplot(citizen_govt, aes(x = citizen, y = mean_trust)) +
-  geom_col(fill = "blue") +
-  labs(x = "Citizenship Status",
-       y = "Avg. Confidence in Gov't (1-4 scale)") +
-  theme_bw()
-
-```
-
-
-**Challenge:** Create a similar graph (and re-summarize the data) to also include respondent class. Group by both respondent class and citizen status when summarizing trust. Plot class on the x-axis, confidence on the y-axis, and specify citizenship to be the "fill" of the bars in the `aes` argument.
-
-
-```{r citizen_govt2, exercise = TRUE, exercise.setup = "prepare-citizen"}
-
-
-```
-```{r citizen_govt2-hint-1}
-
-#summarize data
-citizen_govt2 <- world_values %>%
-  select(conf_govt, citizen, class) %>%
-  filter(!is.na(___)) %>% #remove NAs for citizen variable
-  filter(!is.na(___)) %>% #remove NAs for class variable
-  group_by(citizen, class) %>%
-  summarize(mean_trust = mean(conf_govt, na.rm = T))
-
-#plot 
-ggplot(citizen_govt2, aes(x = class, y = mean_trust, fill = citizen)) +
-  geom_col(position = "dodge") +
-  labs(x = "Socioeconomic Class",
-       y = "Avg. Confidence in Gov't (1-4 scale)") +
-  theme_bw()
-
-
-```
-```{r citizen_govt2-hint-2}
-
-#summarize data
-citizen_govt2 <- world_values %>%
-  select(conf_govt, citizen, class) %>%
-  filter(!is.na(citizen)) %>%
-  filter(!is.na(class)) %>%
-  group_by(citizen, class) %>%
-  summarize(mean_trust = mean(conf_govt, na.rm = T))
-
-#plot 
-ggplot(citizen_govt2, aes(x = class, y = mean_trust, fill = citizen)) +
-  geom_col(position = "dodge") +
-  labs(x = "Socioeconomic Class",
-       y = "Avg. Confidence in Gov't (1-4 scale)",
-       title = "Class, Citizenship, and Confidence in Gov't") +
-  theme_bw()
-
-```
-
-Once you have completed these tasks, please complete [this comprehension quiz.](https://unc.az1.qualtrics.com/jfe/form/SV_8wfkiUYbmaEiKfY).
-
 
 
