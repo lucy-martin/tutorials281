@@ -128,7 +128,7 @@ These are commonly confused with histograms, but they are very different. While 
 For example, the bar chart below shows us the results of a survey conducted by [Russia Watcher](https://twitter.com/russia_watcher/status/1626341318413922304/photo/1), an organization based at Princeton University that aims to understand public opinion in Russia since the start of the war in Ukraine in February 2022. This particular chart shows how respondents answered the following question in February 2023, one year after the war began: "Do you think that a year from now you (your family) will live better or worse than now?" The x-axis shows the possible answers, and the y-axis shows the percentage of respondents who chose each answer. As you can see 31.2 percent of respondents answered "The same as now," whereas only 6.4 percent of respondents answered "Much worse." Interesting!
 
 
-![Public opinion in Russia during the war in Ukraine.](tutorials281/inst/week6_tutorial/Russia.png)
+![Public opinion in Russia during the war in Ukraine.](Russia.png)
 
 
 ## Topic 3: Visualizations That Use Multiple Variables
