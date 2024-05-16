@@ -18,7 +18,7 @@ library(devtools)
 Then, run the following code:
 
 ```{r}
-devtools::install_github("isabel-laterzo/tutorials281")
+devtools::install_github("lucy-martin/tutorials281")
 library(tutorials281)
 ```
 You can then run individual tutorials on your local machine by running the following line of code:
